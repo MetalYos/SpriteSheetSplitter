@@ -1,4 +1,5 @@
 #include "framedetection.h"
+#include "constants.h"
 
 FrameDetection::FrameDetection()
     : _imageData(nullptr),
@@ -44,7 +45,8 @@ Frame* FrameDetection::DetectFrame(int originX, int originY)
 
     std::pair<int, int> min(_imageData->Width(), _imageData->Height());
     std::pair<int, int> max(0, 0);
-    DetectFrameLoop(originX, originY, min, max, 0);
+    if (!DetectFrameLoop(originX, originY, min, max, 0))
+        return nullptr;
 
     Frame* frame = new Frame(min.second, min.first, max.first - min.first, max.second - min.second);
     return frame;
@@ -54,13 +56,31 @@ std::vector<Frame*> FrameDetection::DetectAllFrames()
 {
     std::vector<Frame*> frames;
 
+    int step = 5;
+    for (int y = step; y < _imageData->Height(); y += step)
+    {
+        for (int x = step; x < _imageData->Width(); x+= step)
+        {
+            Frame* frame = DetectFrame(x, y);
+            if (frame == nullptr)
+                continue;
+            else
+                frames.push_back(frame);
+        }
+    }
+
+
     return frames;
 }
 
-void FrameDetection::DetectFrameLoop(int x, int y, std::pair<int, int>& min, std::pair<int, int>& max, int numBgPixels)
+bool FrameDetection::DetectFrameLoop(int x, int y, std::pair<int, int>& min, std::pair<int, int>& max, int numBgPixels)
 {
-    _coordsStack.push_back({x, y, numBgPixels});
+    if (IsBackgroundPixel(x, y))
+        return false;
+    if (IsPixelAlreadyVisited(x, y))
+        return false;
 
+    _coordsStack.push_back({x, y, numBgPixels});
     while (_coordsStack.size() > 0)
     {
         auto coords = _coordsStack.back();
@@ -76,14 +96,13 @@ void FrameDetection::DetectFrameLoop(int x, int y, std::pair<int, int>& min, std
         if (!_imageData->IsInsideImage(curX, curY))
             continue;
         // If I am now at a pixel that was already visited, move to the next coordinate.
-        if (_pixelsVisited[index])
+        if (IsPixelAlreadyVisited(curX, curY))
             continue;
         // 3. If we are outside the tolerance, move to the next coordinate.
         if (curNumBgPixels > _tolerance)
             continue;
 
-        auto color = _imageData->GetPixelColor(curX, curY);
-        if (color.A != 0 && color != _backgroundColor)
+        if (!IsBackgroundPixel(curX, curY))
         {
             if (curX < min.first)
                 min.first = curX;
@@ -108,6 +127,8 @@ void FrameDetection::DetectFrameLoop(int x, int y, std::pair<int, int>& min, std
         // Mark this pixel as visited
         _pixelsVisited[index] = true;
     }
+
+    return true;
 }
 
 void FrameDetection::CalculateAxesIntersections()
@@ -174,4 +195,16 @@ void FrameDetection::ClearAxesIntersections()
         delete[] _yAxisIntersections;
         _yAxisIntersections = nullptr;
     }
+}
+
+bool FrameDetection::IsBackgroundPixel(int x, int y) const
+{
+    auto color = _imageData->GetPixelColor(x, y);
+    return !(color.A > Constants::FRAME_COLOR_TOLERANCE && color != _backgroundColor);
+}
+
+bool FrameDetection::IsPixelAlreadyVisited(int x, int y) const
+{
+    int index = y * _imageData->Width() + x;
+    return _pixelsVisited[index];
 }

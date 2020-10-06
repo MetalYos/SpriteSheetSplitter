@@ -165,6 +165,7 @@ void MainWindow::CreateCalcFrameWidget(QVBoxLayout* framesDockLayout)
     connect(calcFrameButton, &QPushButton::clicked, this, &MainWindow::OnCalculateFrameButtonClicked);
 
     QPushButton* calcAllFramesButton = new QPushButton(tr("Calculate All Frames"), calcFrameWidget);
+    connect(calcAllFramesButton, &QPushButton::clicked, this, &MainWindow::OnCalculateAllFramesButtonClicked);
 
     buttonsLayout->addWidget(calcFrameButton);
     buttonsLayout->addWidget(calcAllFramesButton);
@@ -260,6 +261,10 @@ void MainWindow::OnOpenSpriteSheet()
     if (spriteSheetLabel->LoadImage(fileName.toStdString()))
     {
         EnableFramesDock();
+
+        int tolerance = toleranceSpinBox->value();
+        PixelColor backgroundColor(255, 255, 255, 0);
+        FrameDetection::Instance().SetParameters(&spriteSheetLabel->GetImage(), backgroundColor, tolerance);
     }
 }
 
@@ -348,10 +353,6 @@ void MainWindow::OnCalculateFrameButtonClicked()
     if (frame == nullptr)
         return;
 
-    int tolerance = toleranceSpinBox->value();
-    PixelColor backgroundColor(255, 255, 255, 0);
-
-    FrameDetection::Instance().SetParameters(&spriteSheetLabel->GetImage(), backgroundColor, tolerance);
     Frame* temp = FrameDetection::Instance().DetectFrame(frame->OriginAtParentCoords().first,
                                                          frame->OriginAtParentCoords().second);
     if (temp != nullptr)
@@ -359,5 +360,17 @@ void MainWindow::OnCalculateFrameButtonClicked()
         frame->SetFrame(temp->Top(), temp->Left(), temp->Bottom(), temp->Right());
         delete temp;
         spriteSheetLabel->update();
+    }
+}
+
+void MainWindow::OnCalculateAllFramesButtonClicked()
+{
+    auto frames = FrameDetection::Instance().DetectAllFrames();
+
+    // Clear the current list frames
+    ClearFramesList();
+    for (Frame* frame : frames)
+    {
+        AddFrameToList(frame);
     }
 }

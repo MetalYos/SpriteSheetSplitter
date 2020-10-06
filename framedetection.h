@@ -25,10 +25,12 @@ public:
 
 private:
     FrameDetection();
-    void DetectFrameLoop(int x, int y, std::pair<int, int>& min, std::pair<int, int>& max, int numBgPixels);
+    bool DetectFrameLoop(int x, int y, std::pair<int, int>& min, std::pair<int, int>& max, int numBgPixels);
     void CalculateAxesIntersections();
     void CalculateOneAxisIntersections(bool isYAxis);
     void ClearAxesIntersections();
+    bool IsBackgroundPixel(int x, int y) const;
+    bool IsPixelAlreadyVisited(int x, int y) const;
 
 private:
     const Image* _imageData;

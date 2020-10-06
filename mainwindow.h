@@ -51,6 +51,7 @@ private slots:
     void OnRemoveFrameButtonClicked();
     void OnClearFramesButtonClicked();
     void OnCalculateFrameButtonClicked();
+    void OnCalculateAllFramesButtonClicked();
 
 private:
     Ui::MainWindow *ui;

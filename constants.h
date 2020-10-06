@@ -15,6 +15,7 @@ namespace Constants
     const int FRAME_TOLERANCE_MIN = 0;
     const int FRAME_TOLERANCE_MAX = 50;
     const int FRAME_TOLERANCE_INIT = 1;
+    const int FRAME_COLOR_TOLERANCE = 3;
 }
 
 #endif // CONSTANTS_H
