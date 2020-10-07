@@ -9,6 +9,7 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    backgroundcolorlistwidget.cpp \
     frame.cpp \
     framedetection.cpp \
     image.cpp \
@@ -20,6 +21,7 @@ SOURCES += \
     utils.cpp
 
 HEADERS += \
+    backgroundcolorlistwidget.h \
     constants.h \
     frame.h \
     framedetection.h \

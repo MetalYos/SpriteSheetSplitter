@@ -16,7 +16,7 @@ FrameDetection::~FrameDetection()
 }
 
 void FrameDetection::SetParameters(const Image* imageData,
-                     const PixelColor& backgroundColor,
+                     const GraphicsUtils::PixelColor& backgroundColor,
                      int tolerance)
 {
     if (!imageData)

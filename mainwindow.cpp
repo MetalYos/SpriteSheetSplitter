@@ -14,6 +14,7 @@
 #include "framedetection.h"
 #include "utils.h"
 #include "jsonhelper.h"
+#include "backgroundcolorlistwidget.h"
 
 #include <iostream>
 #include <fstream>
@@ -146,16 +147,14 @@ void MainWindow::CreateCalcFrameWidget(QVBoxLayout* framesDockLayout)
 
     QVBoxLayout* mainLayout = new QVBoxLayout();
 
+    BackgroundColorListWidget* bgColorList = new BackgroundColorListWidget(this, calcFrameWidget);
+    mainLayout->addWidget(bgColorList);
+
     QFormLayout* formLayout = new QFormLayout();
-
-    QPushButton* colorPicker = new QPushButton(calcFrameWidget);
-
     toleranceSpinBox = new QSpinBox(calcFrameWidget);
     toleranceSpinBox->setMinimum(Constants::FRAME_TOLERANCE_MIN);
     toleranceSpinBox->setMaximum(Constants::FRAME_TOLERANCE_MAX);
     toleranceSpinBox->setValue(Constants::FRAME_TOLERANCE_INIT);
-
-    formLayout->addRow(tr("&Background Color: "), colorPicker);
     formLayout->addRow(tr("Tolerance: "), toleranceSpinBox);
 
     mainLayout->addLayout(formLayout);
@@ -238,7 +237,7 @@ void MainWindow::LoadSpriteSheet(const QString& filepath)
         ClearFramesList();
 
         int tolerance = toleranceSpinBox->value();
-        PixelColor backgroundColor(255, 255, 255, 0);
+        GraphicsUtils::PixelColor backgroundColor(255, 255, 255, 0);
         FrameDetection::Instance().SetParameters(&spriteSheetLabel->GetImage(), backgroundColor, tolerance);
     }
 }

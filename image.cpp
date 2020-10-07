@@ -65,9 +65,9 @@ unsigned int Image::BytesPerLine() const
     return width * numChannels;
 }
 
-PixelColor Image::GetPixelColor(int x, int y) const
+GraphicsUtils::PixelColor Image::GetPixelColor(int x, int y) const
 {
-    PixelColor color;
+    GraphicsUtils::PixelColor color;
 
     if (IsInsideImage(x, y))
     {
