@@ -39,6 +39,7 @@ private:
     void EnableFramesDock();
     void DisableFramesDock();
 
+    void LoadSpriteSheet(const QString& filepath);
     void AddFrameToList(Frame* frame);
     void ClearFramesList();
 

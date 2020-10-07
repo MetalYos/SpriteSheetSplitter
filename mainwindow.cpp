@@ -7,6 +7,7 @@
 #include <QSizePolicy>
 #include <QListWidgetItem>
 #include <QFormLayout>
+#include <QMessageBox>
 #include <sstream>
 #include "mainwindowviewmodel.h"
 #include "constants.h"
@@ -229,6 +230,19 @@ void MainWindow::DisableFramesDock()
     framesWidget->setEnabled(false);
 }
 
+void MainWindow::LoadSpriteSheet(const QString& filepath)
+{
+    if (spriteSheetLabel->LoadImage(filepath.toStdString()))
+    {
+        EnableFramesDock();
+        ClearFramesList();
+
+        int tolerance = toleranceSpinBox->value();
+        PixelColor backgroundColor(255, 255, 255, 0);
+        FrameDetection::Instance().SetParameters(&spriteSheetLabel->GetImage(), backgroundColor, tolerance);
+    }
+}
+
 void MainWindow::AddFrameToList(Frame* frame)
 {
     MainWindowViewModel::Instance().AddFrame(frame);
@@ -258,14 +272,7 @@ void MainWindow::OnOpenSpriteSheet()
     if (fileName.isEmpty())
         return;
 
-    if (spriteSheetLabel->LoadImage(fileName.toStdString()))
-    {
-        EnableFramesDock();
-
-        int tolerance = toleranceSpinBox->value();
-        PixelColor backgroundColor(255, 255, 255, 0);
-        FrameDetection::Instance().SetParameters(&spriteSheetLabel->GetImage(), backgroundColor, tolerance);
-    }
+    LoadSpriteSheet(fileName);
 }
 
 void MainWindow::OnImportMetaData()
@@ -281,10 +288,7 @@ void MainWindow::OnImportMetaData()
 
     // Load the new sprite sheet image
     auto spriteSheetPath = StringUtils::ReplaceFilename(filepath.toStdString(), results.first);
-    if (spriteSheetLabel->LoadImage(spriteSheetPath))
-    {
-        EnableFramesDock();
-    }
+    LoadSpriteSheet(QString(spriteSheetPath.c_str()));
 
     // Clear the current list frames
     ClearFramesList();
@@ -301,7 +305,24 @@ void MainWindow::OnExportMetaData()
         return;
 
     auto sSheetPath = spriteSheetLabel->GetImage().Filepath();
-    JsonHelper::ExportJson(sSheetPath, frames);
+    auto sSheetFilename = StringUtils::GetFilename(sSheetPath);
+    auto sSheetName = StringUtils::GetFilenameWithoutExt(sSheetFilename);
+    auto outputPath = StringUtils::GetFilepathWithoutFile(sSheetPath) + sSheetName + ".json";
+
+    QMessageBox msgBox;
+    QString statusBarMessage;
+    if (JsonHelper::ExportJson(outputPath, sSheetName, sSheetFilename, frames))
+    {
+        msgBox.setText("Export finished successfully");
+        statusBarMessage = "File was exported to " + QString(outputPath.c_str());
+    }
+    else
+    {
+        msgBox.setText("Export failed!");
+        statusBarMessage = "Export to file " + QString(outputPath.c_str()) + " failed!";
+    }
+    msgBox.exec();
+    statusBar()->showMessage("File was exported to " + QString(outputPath.c_str()), 3);
 }
 
 void MainWindow::OnSelectedFrameChanged(int frameIndex)

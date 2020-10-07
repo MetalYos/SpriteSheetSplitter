@@ -10,7 +10,7 @@ class JsonHelper
 {
 public:
     static bool ImportJson(const std::string& filepath, std::pair<std::string, std::vector<Frame*>>& output);
-    static bool ExportJson(const std::string& sSheetPath, const std::vector<Frame*>& frames);
+    static bool ExportJson(const std::string& sSheetPath, const std::string& sSheetName, const std::string& sSheetFilename, const std::vector<Frame*>& frames);
 
 private:
     static std::string GetStringValue(const std::string& line);

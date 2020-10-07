@@ -63,14 +63,11 @@ bool JsonHelper::ImportJson(const std::string& filepath, std::pair<std::string, 
     return true;
 }
 
-bool JsonHelper::ExportJson(const std::string& sSheetPath, const std::vector<Frame*>& frames)
+bool JsonHelper::ExportJson(const std::string& outputPath, const std::string& sSheetName,
+                            const std::string& sSheetFilename, const std::vector<Frame*>& frames)
 {
     if (frames.size() == 0)
         return false;
-
-    auto sSheetFilename = StringUtils::GetFilename(sSheetPath);
-    auto sSheetName = StringUtils::GetFilenameWithoutExt(sSheetFilename);
-    auto outputPath = StringUtils::GetFilepathWithoutFile(sSheetPath) + sSheetName + ".json";
 
     std::ofstream outFile;
     outFile.open(outputPath.c_str(), std::ios::out);
