@@ -5,16 +5,14 @@ FrameDetection::FrameDetection()
     : _imageData(nullptr),
       _tolerance(0),
       _areParamsSet(false),
-      _pixelsVisited(nullptr),
-      _xAxisIntersections(nullptr),
-      _yAxisIntersections(nullptr)
+      _pixelsVisited(nullptr)
 {
 
 }
 
 FrameDetection::~FrameDetection()
 {
-    ClearAxesIntersections();
+
 }
 
 void FrameDetection::SetParameters(const Image* imageData,
@@ -33,9 +31,6 @@ void FrameDetection::SetParameters(const Image* imageData,
     _pixelsVisited = new bool[numPixels];
     for (int i = 0; i < numPixels; i++)
         _pixelsVisited[i] = false;
-
-    ClearAxesIntersections();
-    CalculateAxesIntersections();
 }
 
 Frame* FrameDetection::DetectFrame(int originX, int originY)
@@ -129,72 +124,6 @@ bool FrameDetection::DetectFrameLoop(int x, int y, std::pair<int, int>& min, std
     }
 
     return true;
-}
-
-void FrameDetection::CalculateAxesIntersections()
-{
-    _xAxisIntersections = new std::vector<std::pair<int, int>>[_imageData->Width()];
-    _yAxisIntersections = new std::vector<std::pair<int, int>>[_imageData->Height()];
-
-    CalculateOneAxisIntersections(false);
-    CalculateOneAxisIntersections(true);
-}
-
-void FrameDetection::CalculateOneAxisIntersections(bool isYAxis)
-{
-    auto& axis = _xAxisIntersections;
-    int majorLen = _imageData->Width();
-    int minorLen = _imageData->Height();
-    if (isYAxis)
-    {
-        axis = _yAxisIntersections;
-        majorLen = _imageData->Height();
-        minorLen = _imageData->Width();
-    }
-
-    for (int major = 0; major < majorLen; major++)
-    {
-        for (int minor = 0; minor < minorLen; minor++)
-        {
-            bool inside = false;
-            auto color = _imageData->GetPixelColor(major, minor);
-            if (color.A != 0 && color != _backgroundColor)
-            {
-                if (!inside)
-                {
-                    axis[major].push_back({minor, minor});
-                    inside = true;
-                }
-            }
-            else
-            {
-                if (inside)
-                {
-                    axis[major].back().second = minor - 1;
-                    inside = false;
-                }
-            }
-        }
-    }
-}
-
-void FrameDetection::ClearAxesIntersections()
-{
-    if (_xAxisIntersections != nullptr)
-    {
-        for (int i = 0; i < _imageData->Width(); i++)
-            _xAxisIntersections[i].clear();
-        delete[] _xAxisIntersections;
-        _xAxisIntersections = nullptr;
-    }
-
-    if (_yAxisIntersections != nullptr)
-    {
-        for (int i = 0; i < _imageData->Height(); i++)
-            _yAxisIntersections[i].clear();
-        delete[] _yAxisIntersections;
-        _yAxisIntersections = nullptr;
-    }
 }
 
 bool FrameDetection::IsBackgroundPixel(int x, int y) const

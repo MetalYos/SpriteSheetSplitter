@@ -26,9 +26,6 @@ public:
 private:
     FrameDetection();
     bool DetectFrameLoop(int x, int y, std::pair<int, int>& min, std::pair<int, int>& max, int numBgPixels);
-    void CalculateAxesIntersections();
-    void CalculateOneAxisIntersections(bool isYAxis);
-    void ClearAxesIntersections();
     bool IsBackgroundPixel(int x, int y) const;
     bool IsPixelAlreadyVisited(int x, int y) const;
 
@@ -41,10 +38,6 @@ private:
     bool* _pixelsVisited;
 
     std::vector<std::tuple<int, int, int>> _coordsStack;
-
-    // Calculate all frames parameters
-    std::vector<std::pair<int, int>>* _xAxisIntersections;
-    std::vector<std::pair<int, int>>* _yAxisIntersections;
 };
 
 #endif // FRAMEDETECTION_H
