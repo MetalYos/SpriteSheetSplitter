@@ -1,5 +1,5 @@
-#ifndef MATHUTILS_H
-#define MATHUTILS_H
+#ifndef UTILS_H
+#define UTILS_H
 
 #include <string>
 
@@ -54,4 +54,4 @@ namespace StringUtils
     std::string ReplaceFilename(const std::string& filepath, const std::string& filename);
 }
 
-#endif // MATHUTILS_H
+#endif // UTILS_H
