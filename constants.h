@@ -1,7 +1,7 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-namespace Constants
+struct Constants
 {
     enum MouseButtons
     {
@@ -10,12 +10,13 @@ namespace Constants
         MIDDLE_MOUSE_BUTTON
     };
 
-    const int FRAME_INIT_WIDTH = 100;
-    const int FRAME_INIT_HEIGHT = 100;
-    const int FRAME_TOLERANCE_MIN = 0;
-    const int FRAME_TOLERANCE_MAX = 50;
-    const int FRAME_TOLERANCE_INIT = 1;
-    const int FRAME_COLOR_TOLERANCE = 3;
-}
+    static const int FRAME_INIT_WIDTH;
+    static const int FRAME_INIT_HEIGHT;
+    static const int FRAME_TOLERANCE_MIN;
+    static const int FRAME_TOLERANCE_MAX;
+    static const int FRAME_TOLERANCE_INIT;
+    static const int FRAME_COLOR_TOLERANCE;
+    static const char* COLOR_PICKER_CURSOR_PATH;
+};
 
 #endif // CONSTANTS_H
