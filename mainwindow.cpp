@@ -10,9 +10,10 @@
 #include <QMessageBox>
 #include <QPoint>
 #include <QScrollArea>
+#include <QCheckBox>
 #include <sstream>
 #include "mainwindowviewmodel.h"
-#include "constants.h"
+#include "settings.h"
 #include "framedetection.h"
 #include "utils.h"
 #include "jsonhelper.h"
@@ -30,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent)
       centralWidget(nullptr), spriteSheetLabel(nullptr)
 {
     ui->setupUi(this);
+    showMaximized();
 
     CreateMenu();
     CreateToolBar();
@@ -151,12 +153,41 @@ void MainWindow::CreateCalcFrameWidget(QVBoxLayout* framesDockLayout)
 
     QFormLayout* formLayout = new QFormLayout();
     toleranceSpinBox = new QSpinBox(calcFrameWidget);
-    toleranceSpinBox->setMinimum(Constants::FRAME_TOLERANCE_MIN);
-    toleranceSpinBox->setMaximum(Constants::FRAME_TOLERANCE_MAX);
-    toleranceSpinBox->setValue(Constants::FRAME_TOLERANCE_INIT);
+    toleranceSpinBox->setMinimum(Settings::FRAME_TOLERANCE_MIN);
+    toleranceSpinBox->setMaximum(Settings::FRAME_TOLERANCE_MAX);
+    toleranceSpinBox->setValue(Settings::FRAME_TOLERANCE_INIT);
     formLayout->addRow(tr("Tolerance: "), toleranceSpinBox);
-
     mainLayout->addLayout(formLayout);
+
+    // Add Adaptive Step checkbox
+    QCheckBox* adaptiveStepCheckBox = new QCheckBox(calcFrameWidget);
+    adaptiveStepCheckBox->setChecked(Settings::FRAME_DETECTION_ALGO_USE_ADAPTIVE_STEP);
+    adaptiveStepCheckBox->setText(tr("Use Adaptive Steps?"));
+    connect(adaptiveStepCheckBox, &QCheckBox::stateChanged,
+            this, &MainWindow::OnUseAdaptiveStepCheckboxStateChanged);
+    mainLayout->addWidget(adaptiveStepCheckBox);
+
+    // Add Steps Widget
+    stepsWidget = new QWidget(calcFrameWidget);
+    QFormLayout* stepsForm = new QFormLayout();
+    QSpinBox* stepxSpinBox = new QSpinBox(stepsWidget);
+    stepxSpinBox->setMinimum(1);
+    stepxSpinBox->setMaximum(10000);
+    stepxSpinBox->setValue(Settings::FRAME_DETECTION_ALGO_STEP);
+    stepsForm->addRow(tr("Steps X: "), stepxSpinBox);
+
+    QSpinBox* stepySpinBox = new QSpinBox(stepsWidget);
+    stepySpinBox->setMinimum(1);
+    stepySpinBox->setMaximum(10000);
+    stepySpinBox->setValue(Settings::FRAME_DETECTION_ALGO_STEP);
+    stepsForm->addRow(tr("Steps Y: "), stepySpinBox);
+
+    stepsWidget->setLayout(stepsForm);
+
+    if (Settings::FRAME_DETECTION_ALGO_USE_ADAPTIVE_STEP)
+        stepsWidget->setVisible(false);
+
+    mainLayout->addWidget(stepsWidget);
 
     QHBoxLayout* buttonsLayout = new QHBoxLayout();
 
@@ -306,10 +337,10 @@ void MainWindow::OnSelectedFrameChanged(int frameIndex)
 
 void MainWindow::OnAddFrameButtonClicked()
 {
-    int left = spriteSheetLabel->ImageWidth() / 2 - Constants::FRAME_INIT_WIDTH / 2;
-    int top = spriteSheetLabel->ImageHeight() / 2 - Constants::FRAME_INIT_HEIGHT / 2;
+    int left = spriteSheetLabel->ImageWidth() / 2 - Settings::FRAME_INIT_WIDTH / 2;
+    int top = spriteSheetLabel->ImageHeight() / 2 - Settings::FRAME_INIT_HEIGHT / 2;
 
-    Frame* frame = new Frame(top, left, Constants::FRAME_INIT_WIDTH, Constants::FRAME_INIT_HEIGHT);
+    Frame* frame = new Frame(top, left, Settings::FRAME_INIT_WIDTH, Settings::FRAME_INIT_HEIGHT);
 
     AddFrameToList(frame);
 }
@@ -371,4 +402,10 @@ void MainWindow::OnCalculateAllFramesButtonClicked()
     {
         AddFrameToList(frame);
     }
+}
+
+void MainWindow::OnUseAdaptiveStepCheckboxStateChanged(int state)
+{
+    Settings::FRAME_DETECTION_ALGO_USE_ADAPTIVE_STEP = (state == Qt::Checked);
+    stepsWidget->setVisible(!Settings::FRAME_DETECTION_ALGO_USE_ADAPTIVE_STEP);
 }

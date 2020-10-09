@@ -58,6 +58,7 @@ private slots:
     void OnClearFramesButtonClicked();
     void OnCalculateFrameButtonClicked();
     void OnCalculateAllFramesButtonClicked();
+    void OnUseAdaptiveStepCheckboxStateChanged(int state);
 
 private:
     Ui::MainWindow *ui;
@@ -76,6 +77,7 @@ private:
     // Calc Frames Parameters
     BackgroundColorListWidget* bgColorListWidget;
     QSpinBox* toleranceSpinBox;
+    QWidget* stepsWidget;
 
     // Central Widget
     QWidget* centralWidget;

@@ -36,6 +36,7 @@ private:
 
     bool _areParamsSet;
     bool* _pixelsVisited;
+    std::pair<int, int> _steps;
 
     std::vector<std::tuple<int, int, int>> _coordsStack;
 };

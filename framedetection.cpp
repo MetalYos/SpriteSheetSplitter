@@ -1,11 +1,12 @@
 #include "framedetection.h"
-#include "constants.h"
+#include "settings.h"
 
 FrameDetection::FrameDetection()
     : _imageData(nullptr),
       _tolerance(0),
       _areParamsSet(false),
-      _pixelsVisited(nullptr)
+      _pixelsVisited(nullptr),
+      _steps({ Settings::FRAME_DETECTION_ALGO_STEP, Settings::FRAME_DETECTION_ALGO_STEP })
 {
 
 }
@@ -51,16 +52,22 @@ std::vector<Frame*> FrameDetection::DetectAllFrames()
 {
     std::vector<Frame*> frames;
 
-    int step = 5;
-    for (int y = step; y < _imageData->Height(); y += step)
+    for (int y = _steps.second; y < _imageData->Height(); y += _steps.second)
     {
-        for (int x = step; x < _imageData->Width(); x+= step)
+        for (int x = _steps.first; x < _imageData->Width(); x+= _steps.first)
         {
             Frame* frame = DetectFrame(x, y);
             if (frame == nullptr)
                 continue;
             else
+            {
                 frames.push_back(frame);
+                if (Settings::FRAME_DETECTION_ALGO_USE_ADAPTIVE_STEP)
+                {
+                    _steps.first = frame->Width() / 4;
+                    _steps.second = frame->Height() / 4;
+                }
+            }
         }
     }
 
@@ -131,7 +138,7 @@ bool FrameDetection::IsBackgroundPixel(int x, int y) const
     auto color = _imageData->GetPixelColor(x, y);
 
     bool isBg = false;
-    isBg |= (color.A <= Constants::FRAME_COLOR_TOLERANCE);
+    isBg |= (color.A <= Settings::FRAME_COLOR_TOLERANCE);
     for (auto bgColor : _backgroundColors)
     {
         isBg |= (color == bgColor);

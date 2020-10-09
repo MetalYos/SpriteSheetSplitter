@@ -5,7 +5,7 @@
 #include <QPen>
 #include <sstream>
 #include "mainwindowviewmodel.h"
-#include "constants.h"
+#include "settings.h"
 #include "eventsservice.h"
 #include "qtutils.h"
 
@@ -63,7 +63,7 @@ void ImageLabel::OnStartBgColorPick(void* data)
     _isBgColorSelectionMode = true;
 
     // Set Cursor to be of a drip
-    QtUtils::SetCursor(this, Constants::COLOR_PICKER_CURSOR_PATH, 2, 30);
+    QtUtils::SetCursor(this, Settings::COLOR_PICKER_CURSOR_PATH, 2, 30);
 }
 
 QSize ImageLabel::sizeHint() const
@@ -73,11 +73,11 @@ QSize ImageLabel::sizeHint() const
 
 void ImageLabel::mousePressEvent(QMouseEvent* event)
 {
-    mouseButtons[Constants::LEFT_MOUSE_BUTTON] = (event->button() == Qt::LeftButton);
-    mouseButtons[Constants::RIGHT_MOUSE_BUTTON] = (event->button() == Qt::RightButton);
-    mouseButtons[Constants::MIDDLE_MOUSE_BUTTON] = (event->button() == Qt::MiddleButton);
+    mouseButtons[Settings::LEFT_MOUSE_BUTTON] = (event->button() == Qt::LeftButton);
+    mouseButtons[Settings::RIGHT_MOUSE_BUTTON] = (event->button() == Qt::RightButton);
+    mouseButtons[Settings::MIDDLE_MOUSE_BUTTON] = (event->button() == Qt::MiddleButton);
 
-    if (mouseButtons[Constants::LEFT_MOUSE_BUTTON])
+    if (mouseButtons[Settings::LEFT_MOUSE_BUTTON])
     {
         bool nonSelected = true;
         lastMousePos = std::pair<int, int>(event->x(), event->y());
@@ -115,9 +115,9 @@ void ImageLabel::mousePressEvent(QMouseEvent* event)
 
 void ImageLabel::mouseReleaseEvent(QMouseEvent* event)
 {
-    mouseButtons[Constants::LEFT_MOUSE_BUTTON] = !(event->button() == Qt::LeftButton);
-    mouseButtons[Constants::RIGHT_MOUSE_BUTTON] = !(event->button() == Qt::RightButton);
-    mouseButtons[Constants::MIDDLE_MOUSE_BUTTON] = !(event->button() == Qt::MiddleButton);
+    mouseButtons[Settings::LEFT_MOUSE_BUTTON] = !(event->button() == Qt::LeftButton);
+    mouseButtons[Settings::RIGHT_MOUSE_BUTTON] = !(event->button() == Qt::RightButton);
+    mouseButtons[Settings::MIDDLE_MOUSE_BUTTON] = !(event->button() == Qt::MiddleButton);
 }
 
 void ImageLabel::mouseMoveEvent(QMouseEvent* event)
@@ -133,7 +133,7 @@ void ImageLabel::mouseMoveEvent(QMouseEvent* event)
         {
             if (frame == MainWindowViewModel::Instance().GetSelectedFrame())
             {
-                if (mouseButtons[Constants::LEFT_MOUSE_BUTTON])
+                if (mouseButtons[Settings::LEFT_MOUSE_BUTTON])
                 {
                     frame->Move(event->x() - lastMousePos.first, event->y() - lastMousePos.second,
                             ImageWidth(), ImageHeight());
