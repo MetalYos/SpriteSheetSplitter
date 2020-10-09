@@ -1,4 +1,5 @@
 #include "mainwindowviewmodel.h"
+#include "framedetection.h"
 
 MainWindowViewModel::MainWindowViewModel()
     : selectedFrameIndex(-1)
@@ -9,6 +10,24 @@ MainWindowViewModel::MainWindowViewModel()
 MainWindowViewModel::~MainWindowViewModel()
 {
     ClearFrames();
+}
+
+bool MainWindowViewModel::LoadImage(const std::string& filepath)
+{
+    if (imageRaw != nullptr)
+        delete imageRaw;
+
+    imageRaw = Image::LoadImage(filepath);
+    if (imageRaw == nullptr)
+        return false;
+
+    FrameDetection::Instance().SetImageData(imageRaw);
+    return true;
+}
+
+const Image* MainWindowViewModel::GetImage() const
+{
+    return imageRaw;
 }
 
 void MainWindowViewModel::AddFrame(Frame* frame)
@@ -52,13 +71,15 @@ void MainWindowViewModel::ClearFrames()
     selectedFrameIndex = -1;
 }
 
-void MainWindowViewModel::SetFrames(const std::vector<Frame*> frames)
+void MainWindowViewModel::SetFrames(const std::vector<Frame*>& frames)
 {
-    if (frames.size() > 0)
-        ClearFrames();
+    if (frames.size() == 0)
+        return;
 
+    ClearFrames();
     for (size_t i = 0; i < frames.size(); i++)
         AddFrame(frames[i]);
+    selectedFrameIndex = 0;
 }
 
 Frame* MainWindowViewModel::GetFrame(int index)
@@ -72,6 +93,16 @@ Frame* MainWindowViewModel::GetFrame(int index)
 std::vector<Frame*>& MainWindowViewModel::GetFrames()
 {
     return frames;
+}
+
+int MainWindowViewModel::GetFrameIndex(Frame* frame) const
+{
+    for (size_t i = 0; i < frames.size(); i++)
+    {
+        if (frame == frames[i])
+            return i;
+    }
+    return 0;
 }
 
 Frame* MainWindowViewModel::GetSelectedFrame()
@@ -102,4 +133,43 @@ void MainWindowViewModel::DeselectAllFrames()
 void MainWindowViewModel::SelectLastFrame()
 {
     selectedFrameIndex = frames.size() - 1;
+}
+
+void MainWindowViewModel::SetFrameDetectionParameters(int tolerance)
+{
+    FrameDetection::Instance().SetImageData(imageRaw);
+    FrameDetection::Instance().SetTolerance(tolerance);
+}
+
+void MainWindowViewModel::SetFrameDetectionParameters(const std::vector<GraphicsUtils::PixelColor>& backgroundColor, int tolerance)
+{
+    FrameDetection::Instance().SetParameters(imageRaw, backgroundColor, tolerance);
+}
+
+bool MainWindowViewModel::DetectFrame()
+{
+    auto frame = GetSelectedFrame();
+    if (frame == nullptr)
+        return false;
+
+    Frame* temp = FrameDetection::Instance().DetectFrame(frame->OriginAtParentCoords().first,
+                                                         frame->OriginAtParentCoords().second);
+    if (temp != nullptr)
+    {
+        frame->SetFrame(temp->Top(), temp->Left(), temp->Bottom(), temp->Right());
+        delete temp;
+        return true;
+    }
+    else
+        return false;
+}
+
+bool MainWindowViewModel::DetectAllFrames()
+{
+    if (imageRaw == nullptr)
+        return false;
+
+    auto frames = FrameDetection::Instance().DetectAllFrames();
+    SetFrames(frames);
+    return true;
 }

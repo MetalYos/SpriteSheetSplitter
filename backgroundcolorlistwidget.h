@@ -14,7 +14,7 @@ class BackgroundColorListWidget : public QWidget
     Q_OBJECT
 
 public:
-    BackgroundColorListWidget(MainWindow* mainWindow, QWidget* parent = nullptr);
+    BackgroundColorListWidget(QWidget* parent = nullptr);
     GraphicsUtils::PixelColor GetItemColor(int index);
     std::vector<GraphicsUtils::PixelColor> GetBgColors() const;
 
@@ -52,7 +52,6 @@ private:
     };
 
     QWidget* _parent;
-    MainWindow* _mainWindow;
     QVBoxLayout* _mainLayout;
     std::vector<RowWidget> _rows;
     int _pressedOnRowIndex;

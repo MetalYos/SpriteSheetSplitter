@@ -13,6 +13,7 @@ SOURCES += \
     eventsservice.cpp \
     frame.cpp \
     framedetection.cpp \
+    framesdock.cpp \
     image.cpp \
     imagelabel.cpp \
     jsonhelper.cpp \
@@ -28,6 +29,7 @@ HEADERS += \
     eventsservice.h \
     frame.h \
     framedetection.h \
+    framesdock.h \
     image.h \
     imagelabel.h \
     jsonhelper.h \

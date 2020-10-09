@@ -2,7 +2,7 @@ TODO:
 1. Add indication that export completed in status bar line as well.
 2. Add animation support (add, remove, play).
 3. Add an option to save and load settings.
-
+4. Check why Tolerance is not working.
 
 DONE:
 3. Add Calculate All algorithm.

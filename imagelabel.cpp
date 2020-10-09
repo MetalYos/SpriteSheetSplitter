@@ -10,7 +10,7 @@
 #include "qtutils.h"
 
 ImageLabel::ImageLabel(QWidget* parent) :
-    QLabel(parent), imageRaw(nullptr), image(nullptr), _isBgColorSelectionMode(false)
+    QLabel(parent), qimage(nullptr), _isBgColorSelectionMode(false)
 {
     mouseButtons[0] = false;
     mouseButtons[1] = false;
@@ -22,24 +22,25 @@ ImageLabel::ImageLabel(QWidget* parent) :
 
     EventsService::Instance().Subscribe(EventsTypes::StartBgColorPick,
                                         std::bind(&ImageLabel::OnStartBgColorPick, this, std::placeholders::_1));
+    EventsService::Instance().Subscribe(EventsTypes::RedrawImage,
+                                        std::bind(&ImageLabel::OnRedrawImage, this, std::placeholders::_1));
 }
 
-bool ImageLabel::LoadImage(const std::string& filename)
+bool ImageLabel::LoadImage(const Image* image)
 {
-    if (imageRaw != nullptr)
-        delete imageRaw;
+    if (image == nullptr)
+        return false;
 
-    imageRaw = Image::LoadImage(filename);
-    if (imageRaw != nullptr)
+    if (image != nullptr)
     {
-        QImage* temp = new QImage(imageRaw->Pixels(),
-                           imageRaw->Width(),
-                           imageRaw->Height(),
-                           imageRaw->BytesPerLine(),
+        QImage* temp = new QImage(image->Pixels(),
+                           image->Width(),
+                           image->Height(),
+                           image->BytesPerLine(),
                            QImage::Format_ARGB32);
-        image = new QImage(temp->rgbSwapped());
+        qimage = new QImage(temp->rgbSwapped());
         delete temp;
-        QPixmap pixmap = QPixmap::fromImage(*image);
+        QPixmap pixmap = QPixmap::fromImage(*qimage);
         pixmap.scaled(size(), Qt::KeepAspectRatio);
         setPixmap(pixmap);
 
@@ -52,11 +53,6 @@ bool ImageLabel::LoadImage(const std::string& filename)
     return false;
 }
 
-const Image& ImageLabel::GetImage() const
-{
-    return *imageRaw;
-}
-
 void ImageLabel::OnStartBgColorPick(void* data)
 {
     // Enable Color Selection Mode
@@ -66,9 +62,24 @@ void ImageLabel::OnStartBgColorPick(void* data)
     QtUtils::SetCursor(this, Settings::COLOR_PICKER_CURSOR_PATH, 2, 30);
 }
 
+void ImageLabel::OnRedrawImage(void* data)
+{
+    update();
+}
+
 QSize ImageLabel::sizeHint() const
 {
-    return QSize(ImageWidth(), ImageHeight());
+    int width = 0;
+    int height = 0;
+
+    auto image = MainWindowViewModel::Instance().GetImage();
+    if (image != nullptr)
+    {
+        width = image->Width();
+        height = image->Height();
+    }
+
+    return QSize(width, height);
 }
 
 void ImageLabel::mousePressEvent(QMouseEvent* event)
@@ -84,9 +95,11 @@ void ImageLabel::mousePressEvent(QMouseEvent* event)
         if (_isBgColorSelectionMode)
         {
             // Get Color
-            auto color = imageRaw->GetPixelColor(event->x(), event->y());
+            auto image = MainWindowViewModel::Instance().GetImage();
+            auto color = image->GetPixelColor(event->x(), event->y());
             EventsService::Instance().Publish(EventsTypes::EndBgColorPick, &color);
             setCursor(Qt::ArrowCursor);
+            _isBgColorSelectionMode = false;
         }
         else
         {
@@ -97,6 +110,7 @@ void ImageLabel::mousePressEvent(QMouseEvent* event)
                 {
                     MainWindowViewModel::Instance().SelectFrame(i);
                     nonSelected = false;
+                    EventsService::Instance().Publish(EventsTypes::SelectedFrameOnImage, &i);
                     break;
                 }
             }
@@ -105,6 +119,7 @@ void ImageLabel::mousePressEvent(QMouseEvent* event)
         if (nonSelected)
         {
             MainWindowViewModel::Instance().DeselectAllFrames();
+            EventsService::Instance().Publish(EventsTypes::SelectedFrameOnImage);
         }
 
         update();
@@ -122,9 +137,10 @@ void ImageLabel::mouseReleaseEvent(QMouseEvent* event)
 
 void ImageLabel::mouseMoveEvent(QMouseEvent* event)
 {
-    if (imageRaw == nullptr)
+    if (qimage == nullptr)
         return;
 
+    auto image = MainWindowViewModel::Instance().GetImage();
     bool toUpdate = false;
 
     for (auto frame : MainWindowViewModel::Instance().GetFrames())
@@ -136,7 +152,7 @@ void ImageLabel::mouseMoveEvent(QMouseEvent* event)
                 if (mouseButtons[Settings::LEFT_MOUSE_BUTTON])
                 {
                     frame->Move(event->x() - lastMousePos.first, event->y() - lastMousePos.second,
-                            ImageWidth(), ImageHeight());
+                            image->Width(), image->Height());
                     lastCursor = cursor();
                     setCursor(Qt::DragMoveCursor);
                     toUpdate = true;
@@ -154,8 +170,8 @@ void ImageLabel::mouseMoveEvent(QMouseEvent* event)
         }
     }
 
-    if (event->x() >= 0 && event->x() <= ImageWidth() &&
-        event->y() >= 0 && event->y() <= ImageHeight())
+    if (event->x() >= 0 && event->x() <= image->Width() &&
+        event->y() >= 0 && event->y() <= image->Height())
     {
 
         // Get Main window widget
@@ -166,7 +182,7 @@ void ImageLabel::mouseMoveEvent(QMouseEvent* event)
         // Show coordinates and color in status bar
         std::stringstream ss;
         ss << "(" << event->x() << ", " << event->y() << ")";
-        auto color = imageRaw->GetPixelColor(event->x(), event->y());
+        auto color = image->GetPixelColor(event->x(), event->y());
         ss << "    (" << (int)color.R << ", " << (int)color.G << ", " << (int)color.B << ", " << (int)color.A << ")";
         ((QMainWindow*)p)->statusBar()->showMessage(ss.str().c_str());
     }
@@ -198,20 +214,4 @@ void ImageLabel::paintEvent(QPaintEvent* event)
                          QColor::fromRgb(100, 100, 100, 100));
         painter.setPen(pen);
     }
-}
-
-int ImageLabel::ImageWidth() const
-{
-    if (!imageRaw)
-        return 0;
-
-    return imageRaw->Width();
-}
-
-int ImageLabel::ImageHeight() const
-{
-    if (!imageRaw)
-        return 0;
-
-    return imageRaw->Height();
 }

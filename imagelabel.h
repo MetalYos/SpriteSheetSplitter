@@ -14,14 +14,13 @@ class ImageLabel : public QLabel
 public:
     ImageLabel(QWidget* parent = nullptr);
 
-    bool LoadImage(const std::string& filename);
-    const Image& GetImage() const;
-
+    bool LoadImage(const Image* image);
     int ImageWidth() const;
     int ImageHeight() const;
 
 private:
     void OnStartBgColorPick(void* data);
+    void OnRedrawImage(void* data);
 
     QSize sizeHint() const override;
     void mousePressEvent(QMouseEvent* event) override;
@@ -30,8 +29,7 @@ private:
     void paintEvent(QPaintEvent* event) override;
 
 private:
-    Image* imageRaw;
-    QImage* image;
+    QImage* qimage;
     QCursor lastCursor;
 
     bool mouseButtons[3];

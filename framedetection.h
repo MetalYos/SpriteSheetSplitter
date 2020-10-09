@@ -17,6 +17,9 @@ public:
     }
     ~FrameDetection();
 
+    void SetTolerance(int tolerance);
+    void SetBgColors(const std::vector<GraphicsUtils::PixelColor>& backgroundColor);
+    void SetImageData(Image* image);
     void SetParameters(const Image* imageData,
                        const std::vector<GraphicsUtils::PixelColor>& backgroundColor,
                        int tolerance);
@@ -25,6 +28,7 @@ public:
 
 private:
     FrameDetection();
+    void CreateAlreadyVisitedMatrix();
     bool DetectFrameLoop(int x, int y, std::pair<int, int>& min, std::pair<int, int>& max, int numBgPixels);
     bool IsBackgroundPixel(int x, int y) const;
     bool IsPixelAlreadyVisited(int x, int y) const;

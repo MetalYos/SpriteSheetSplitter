@@ -4,11 +4,11 @@
 #include <sstream>
 #include "qtutils.h"
 #include "eventsservice.h"
+#include "mainwindowviewmodel.h"
 
-BackgroundColorListWidget::BackgroundColorListWidget(MainWindow* mainWindow, QWidget* parent) :
+BackgroundColorListWidget::BackgroundColorListWidget(QWidget* parent) :
     QWidget(parent),
     _parent(parent),
-    _mainWindow(mainWindow),
     _mainLayout(nullptr),
     _pressedOnRowIndex(0)
 {
@@ -41,6 +41,8 @@ void BackgroundColorListWidget::OnEndBgColorPick(void* data)
           (int)bgColor->B << "," <<
           (int)bgColor->A << ");";
     _rows[_pressedOnRowIndex].ColorButton->setStyleSheet(ss.str().c_str());
+
+    MainWindowViewModel::Instance().SetFrameDetectionParameters(GetBgColors());
 }
 
 int BackgroundColorListWidget::AddColorItemRow()

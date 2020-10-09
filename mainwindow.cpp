@@ -19,6 +19,8 @@
 #include "jsonhelper.h"
 #include "qtutils.h"
 #include "backgroundcolorlistwidget.h"
+#include "framesdock.h"
+#include "eventsservice.h"
 
 #include <iostream>
 #include <fstream>
@@ -27,7 +29,6 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow),
       openAction(nullptr), exportAction(nullptr),
-      framesWidget(nullptr), originPreviewWidget(nullptr), framesList(nullptr),
       centralWidget(nullptr), spriteSheetLabel(nullptr)
 {
     ui->setupUi(this);
@@ -96,114 +97,9 @@ void MainWindow::CreateStatusBar()
 
 void MainWindow::CreateFramesDock()
 {
-    QDockWidget* framesDock = new QDockWidget(tr("Frames"), this);
+    FramesDock* framesDock = new FramesDock(tr("Frames"), this);
     framesDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-
-    CreateFramesWidget(framesDock);
-
     addDockWidget(Qt::RightDockWidgetArea, framesDock);
-    DisableFramesDock();
-}
-
-void MainWindow::CreateFramesWidget(QDockWidget* framesDock)
-{
-    // Create Frames dock inner main widget
-    framesWidget = new QWidget(framesDock);
-
-    QVBoxLayout* mainDockLayout = new QVBoxLayout();
-
-    // Create list of Frames widget
-    framesList = new QListWidget(framesDock);
-    framesList->setMinimumHeight(300);
-    connect(framesList, &QListWidget::currentRowChanged, this, &MainWindow::OnSelectedFrameChanged);
-    mainDockLayout->addWidget(framesList);
-
-    // Create list controls widget (add and remove buttons)
-    QHBoxLayout* framesListButtonsLayout = new QHBoxLayout();
-
-    QPushButton* addButton = new QPushButton(tr("Add"), framesWidget);
-    connect(addButton, &QPushButton::clicked, this, &MainWindow::OnAddFrameButtonClicked);
-
-    QPushButton* removeButton = new QPushButton(tr("Remove"), framesWidget);
-    connect(removeButton, &QPushButton::clicked, this, &MainWindow::OnRemoveFrameButtonClicked);
-
-    QPushButton* clearButton = new QPushButton(tr("Clear"), framesWidget);
-    connect(clearButton, &QPushButton::clicked, this, &MainWindow::OnClearFramesButtonClicked);
-
-    framesListButtonsLayout->addWidget(addButton);
-    framesListButtonsLayout->addWidget(removeButton);
-    framesListButtonsLayout->addWidget(clearButton);
-    mainDockLayout->addLayout(framesListButtonsLayout);
-
-    // Create the calculate frames widget
-    CreateCalcFrameWidget(mainDockLayout);
-
-    framesWidget->setLayout(mainDockLayout);
-    framesDock->setWidget(framesWidget);
-}
-
-void MainWindow::CreateCalcFrameWidget(QVBoxLayout* framesDockLayout)
-{
-    calcFrameWidget = new QGroupBox(tr("Calculate Frame/s"), framesWidget);
-
-    QVBoxLayout* mainLayout = new QVBoxLayout();
-
-    bgColorListWidget = new BackgroundColorListWidget(this, calcFrameWidget);
-    mainLayout->addWidget(bgColorListWidget);
-
-    QFormLayout* formLayout = new QFormLayout();
-    toleranceSpinBox = new QSpinBox(calcFrameWidget);
-    toleranceSpinBox->setMinimum(Settings::FRAME_TOLERANCE_MIN);
-    toleranceSpinBox->setMaximum(Settings::FRAME_TOLERANCE_MAX);
-    toleranceSpinBox->setValue(Settings::FRAME_TOLERANCE_INIT);
-    formLayout->addRow(tr("Tolerance: "), toleranceSpinBox);
-    mainLayout->addLayout(formLayout);
-
-    // Add Adaptive Step checkbox
-    QCheckBox* adaptiveStepCheckBox = new QCheckBox(calcFrameWidget);
-    adaptiveStepCheckBox->setChecked(Settings::FRAME_DETECTION_ALGO_USE_ADAPTIVE_STEP);
-    adaptiveStepCheckBox->setText(tr("Use Adaptive Steps?"));
-    connect(adaptiveStepCheckBox, &QCheckBox::stateChanged,
-            this, &MainWindow::OnUseAdaptiveStepCheckboxStateChanged);
-    mainLayout->addWidget(adaptiveStepCheckBox);
-
-    // Add Steps Widget
-    stepsWidget = new QWidget(calcFrameWidget);
-    QFormLayout* stepsForm = new QFormLayout();
-    QSpinBox* stepxSpinBox = new QSpinBox(stepsWidget);
-    stepxSpinBox->setMinimum(1);
-    stepxSpinBox->setMaximum(10000);
-    stepxSpinBox->setValue(Settings::FRAME_DETECTION_ALGO_STEP);
-    stepsForm->addRow(tr("Steps X: "), stepxSpinBox);
-
-    QSpinBox* stepySpinBox = new QSpinBox(stepsWidget);
-    stepySpinBox->setMinimum(1);
-    stepySpinBox->setMaximum(10000);
-    stepySpinBox->setValue(Settings::FRAME_DETECTION_ALGO_STEP);
-    stepsForm->addRow(tr("Steps Y: "), stepySpinBox);
-
-    stepsWidget->setLayout(stepsForm);
-
-    if (Settings::FRAME_DETECTION_ALGO_USE_ADAPTIVE_STEP)
-        stepsWidget->setVisible(false);
-
-    mainLayout->addWidget(stepsWidget);
-
-    QHBoxLayout* buttonsLayout = new QHBoxLayout();
-
-    QPushButton* calcFrameButton = new QPushButton(tr("Calculate Frame"), calcFrameWidget);
-    connect(calcFrameButton, &QPushButton::clicked, this, &MainWindow::OnCalculateFrameButtonClicked);
-
-    QPushButton* calcAllFramesButton = new QPushButton(tr("Calculate All Frames"), calcFrameWidget);
-    connect(calcAllFramesButton, &QPushButton::clicked, this, &MainWindow::OnCalculateAllFramesButtonClicked);
-
-    buttonsLayout->addWidget(calcFrameButton);
-    buttonsLayout->addWidget(calcAllFramesButton);
-
-    mainLayout->addLayout(buttonsLayout);
-
-    calcFrameWidget->setLayout(mainLayout);
-    framesDockLayout->addWidget(calcFrameWidget);
 }
 
 void MainWindow::CreateCentralWidget()
@@ -225,55 +121,22 @@ void MainWindow::CreateCentralWidget()
     setCentralWidget(centralWidget);
 }
 
-void MainWindow::EnableFramesDock()
-{
-    framesWidget->setEnabled(true);
-}
-
-void MainWindow::DisableFramesDock()
-{
-    framesWidget->setEnabled(false);
-}
-
-void MainWindow::LoadSpriteSheet(const QString& filepath)
-{
-    if (spriteSheetLabel->LoadImage(filepath.toStdString()))
-    {
-        EnableFramesDock();
-        ClearFramesList();
-    }
-}
-
-void MainWindow::AddFrameToList(Frame* frame)
-{
-    MainWindowViewModel::Instance().AddFrame(frame);
-
-    // Add to frames list and select it
-    std::stringstream ss;
-    ss << "Frame " << MainWindowViewModel::Instance().GetFrames().size();
-    framesList->addItem(ss.str().c_str());
-    framesList->setCurrentRow(MainWindowViewModel::Instance().GetFrames().size() - 1);
-
-    // repaint the spritesheet label
-    spriteSheetLabel->update();
-}
-
-void MainWindow::ClearFramesList()
-{
-    MainWindowViewModel::Instance().ClearFrames();
-    framesList->clear();
-    spriteSheetLabel->update();
-}
-
 void MainWindow::OnOpenSpriteSheet()
 {
+    // Get the image filepath
     QString fileName = QFileDialog::getOpenFileName(this,
                                                     tr("Open a SpriteSheet"), "",
                                                     tr("Portable Network Graphics (*.png);;All Files(*)"));
     if (fileName.isEmpty())
         return;
 
-    LoadSpriteSheet(fileName);
+    // Load image and pusblish the relevant event
+    if (MainWindowViewModel::Instance().LoadImage(fileName.toStdString()))
+    {
+        spriteSheetLabel->LoadImage(MainWindowViewModel::Instance().GetImage());
+        MainWindowViewModel::Instance().ClearFrames();
+        EventsService::Instance().Publish(EventsTypes::SpriteSheetLoaded, nullptr);
+    }
 }
 
 void MainWindow::OnImportMetaData()
@@ -289,13 +152,11 @@ void MainWindow::OnImportMetaData()
 
     // Load the new sprite sheet image
     auto spriteSheetPath = StringUtils::ReplaceFilename(filepath.toStdString(), results.first);
-    LoadSpriteSheet(QString(spriteSheetPath.c_str()));
-
-    // Clear the current list frames
-    ClearFramesList();
-    for (Frame* frame : results.second)
+    if (MainWindowViewModel::Instance().LoadImage(spriteSheetPath))
     {
-        AddFrameToList(frame);
+        spriteSheetLabel->LoadImage(MainWindowViewModel::Instance().GetImage());
+        MainWindowViewModel::Instance().SetFrames(results.second);
+        EventsService::Instance().Publish(EventsTypes::SpriteSheetLoaded, &results.second);
     }
 }
 
@@ -305,7 +166,7 @@ void MainWindow::OnExportMetaData()
     if (frames.size() == 0)
         return;
 
-    auto sSheetPath = spriteSheetLabel->GetImage().Filepath();
+    auto sSheetPath = MainWindowViewModel::Instance().GetImage()->Filepath();
     auto sSheetFilename = StringUtils::GetFilename(sSheetPath);
     auto sSheetName = StringUtils::GetFilenameWithoutExt(sSheetFilename);
     auto outputPath = StringUtils::GetFilepathWithoutFile(sSheetPath) + sSheetName + ".json";
@@ -324,88 +185,4 @@ void MainWindow::OnExportMetaData()
     }
     msgBox.exec();
     statusBar()->showMessage("File was exported to " + QString(outputPath.c_str()), 3);
-}
-
-void MainWindow::OnSelectedFrameChanged(int frameIndex)
-{
-    if (frameIndex < 0)
-        return;
-
-    MainWindowViewModel::Instance().SelectFrame(frameIndex);
-    spriteSheetLabel->update();
-}
-
-void MainWindow::OnAddFrameButtonClicked()
-{
-    int left = spriteSheetLabel->ImageWidth() / 2 - Settings::FRAME_INIT_WIDTH / 2;
-    int top = spriteSheetLabel->ImageHeight() / 2 - Settings::FRAME_INIT_HEIGHT / 2;
-
-    Frame* frame = new Frame(top, left, Settings::FRAME_INIT_WIDTH, Settings::FRAME_INIT_HEIGHT);
-
-    AddFrameToList(frame);
-}
-
-void MainWindow::OnRemoveFrameButtonClicked()
-{
-    if (!MainWindowViewModel::Instance().GetSelectedFrame())
-        return;
-
-    // Remove the selected frame from the list
-    auto item = framesList->selectedItems()[0];
-    delete framesList->takeItem(framesList->row(item));
-
-    // Remove the selected frame
-    MainWindowViewModel::Instance().RemoveSelectedFrame();
-
-    if (MainWindowViewModel::Instance().GetFrames().size() > 0)
-        framesList->setCurrentRow(MainWindowViewModel::Instance().GetFrames().size() - 1);
-
-    // repaint the spritesheet label
-    spriteSheetLabel->update();
-}
-
-void MainWindow::OnClearFramesButtonClicked()
-{
-    ClearFramesList();
-}
-
-void MainWindow::OnCalculateFrameButtonClicked()
-{
-    auto frame = MainWindowViewModel::Instance().GetSelectedFrame();
-    if (frame == nullptr)
-        return;
-
-    int tolerance = toleranceSpinBox->value();
-    FrameDetection::Instance().SetParameters(&spriteSheetLabel->GetImage(),
-                                             bgColorListWidget->GetBgColors(), tolerance);
-    Frame* temp = FrameDetection::Instance().DetectFrame(frame->OriginAtParentCoords().first,
-                                                         frame->OriginAtParentCoords().second);
-    if (temp != nullptr)
-    {
-        frame->SetFrame(temp->Top(), temp->Left(), temp->Bottom(), temp->Right());
-        delete temp;
-        spriteSheetLabel->update();
-    }
-}
-
-void MainWindow::OnCalculateAllFramesButtonClicked()
-{
-    int tolerance = toleranceSpinBox->value();
-    FrameDetection::Instance().SetParameters(&spriteSheetLabel->GetImage(),
-                                             bgColorListWidget->GetBgColors(), tolerance);
-
-    auto frames = FrameDetection::Instance().DetectAllFrames();
-
-    // Clear the current list frames
-    ClearFramesList();
-    for (Frame* frame : frames)
-    {
-        AddFrameToList(frame);
-    }
-}
-
-void MainWindow::OnUseAdaptiveStepCheckboxStateChanged(int state)
-{
-    Settings::FRAME_DETECTION_ALGO_USE_ADAPTIVE_STEP = (state == Qt::Checked);
-    stepsWidget->setVisible(!Settings::FRAME_DETECTION_ALGO_USE_ADAPTIVE_STEP);
 }

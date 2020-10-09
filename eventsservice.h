@@ -8,8 +8,11 @@ typedef std::function<void(void*)> EventCallback;
 
 enum EventsTypes
 {
+    SpriteSheetLoaded,
     StartBgColorPick,
     EndBgColorPick,
+    RedrawImage,
+    SelectedFrameOnImage,
     None
 };
 
@@ -24,7 +27,7 @@ public:
 
     int Subscribe(EventsTypes type, EventCallback callback);
     void UnSubscribe(EventsTypes type, int id);
-    void Publish(EventsTypes type, void* data);
+    void Publish(EventsTypes type, void* data = nullptr);
 
 private:
     EventsService();

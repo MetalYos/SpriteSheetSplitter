@@ -38,13 +38,6 @@ private:
     void CreateCalcFrameWidget(QVBoxLayout* framesDockLayout);
     void CreateCentralWidget();
 
-    void EnableFramesDock();
-    void DisableFramesDock();
-
-    void LoadSpriteSheet(const QString& filepath);
-    void AddFrameToList(Frame* frame);
-    void ClearFramesList();
-
     // Events Service Handles
     void OnEndBgColorPick(void* data);
 
@@ -52,13 +45,6 @@ private slots:
     void OnOpenSpriteSheet();
     void OnImportMetaData();
     void OnExportMetaData();
-    void OnSelectedFrameChanged(int frameIndex);
-    void OnAddFrameButtonClicked();
-    void OnRemoveFrameButtonClicked();
-    void OnClearFramesButtonClicked();
-    void OnCalculateFrameButtonClicked();
-    void OnCalculateAllFramesButtonClicked();
-    void OnUseAdaptiveStepCheckboxStateChanged(int state);
 
 private:
     Ui::MainWindow *ui;
@@ -67,17 +53,6 @@ private:
     QAction* openAction;
     QAction* importAction;
     QAction* exportAction;
-
-    // Frame Dock widgets
-    QWidget* framesWidget;
-    QGroupBox* calcFrameWidget;
-    QGroupBox* originPreviewWidget;
-    QListWidget* framesList;
-
-    // Calc Frames Parameters
-    BackgroundColorListWidget* bgColorListWidget;
-    QSpinBox* toleranceSpinBox;
-    QWidget* stepsWidget;
 
     // Central Widget
     QWidget* centralWidget;

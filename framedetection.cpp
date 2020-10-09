@@ -13,7 +13,27 @@ FrameDetection::FrameDetection()
 
 FrameDetection::~FrameDetection()
 {
+    if (_pixelsVisited != nullptr)
+        delete[] _pixelsVisited;
+}
 
+void FrameDetection::SetTolerance(int tolerance)
+{
+    _tolerance = tolerance;
+}
+
+void FrameDetection::SetBgColors(const std::vector<GraphicsUtils::PixelColor>& backgroundColor)
+{
+    _backgroundColors = backgroundColor;
+}
+
+void FrameDetection::SetImageData(Image *image)
+{
+    if (image == nullptr)
+        return;
+    _imageData = image;
+
+    CreateAlreadyVisitedMatrix();
 }
 
 void FrameDetection::SetParameters(const Image* imageData,
@@ -27,11 +47,7 @@ void FrameDetection::SetParameters(const Image* imageData,
     _backgroundColors = backgroundColors;
     _tolerance = tolerance;
 
-    // Create a map that indicates if the pixel was visited or not
-    int numPixels = imageData->Width() * imageData->Height();
-    _pixelsVisited = new bool[numPixels];
-    for (int i = 0; i < numPixels; i++)
-        _pixelsVisited[i] = false;
+    CreateAlreadyVisitedMatrix();
 }
 
 Frame* FrameDetection::DetectFrame(int originX, int originY)
@@ -50,6 +66,7 @@ Frame* FrameDetection::DetectFrame(int originX, int originY)
 
 std::vector<Frame*> FrameDetection::DetectAllFrames()
 {
+    CreateAlreadyVisitedMatrix();
     std::vector<Frame*> frames;
 
     for (int y = _steps.second; y < _imageData->Height(); y += _steps.second)
@@ -73,6 +90,18 @@ std::vector<Frame*> FrameDetection::DetectAllFrames()
 
 
     return frames;
+}
+
+void FrameDetection::CreateAlreadyVisitedMatrix()
+{
+    if (_pixelsVisited != nullptr)
+        delete[] _pixelsVisited;
+
+    // Create a map that indicates if the pixel was visited or not
+    int numPixels = _imageData->Width() * _imageData->Height();
+    _pixelsVisited = new bool[numPixels];
+    for (int i = 0; i < numPixels; i++)
+        _pixelsVisited[i] = false;
 }
 
 bool FrameDetection::DetectFrameLoop(int x, int y, std::pair<int, int>& min, std::pair<int, int>& max, int numBgPixels)
