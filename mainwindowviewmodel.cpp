@@ -1,5 +1,6 @@
 #include "mainwindowviewmodel.h"
 #include "framedetection.h"
+#include <algorithm>
 
 MainWindowViewModel::MainWindowViewModel()
     : selectedFrameIndex(-1)
@@ -170,6 +171,8 @@ bool MainWindowViewModel::DetectAllFrames()
         return false;
 
     auto frames = FrameDetection::Instance().DetectAllFrames();
+    std::sort(frames.begin(), frames.end(), FrameComparer());
+
     SetFrames(frames);
     return true;
 }

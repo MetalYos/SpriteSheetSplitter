@@ -40,4 +40,21 @@ private:
     int originY;
 };
 
+class FrameComparer
+{
+    int tolerance = 10;
+
+public:
+    bool operator()(const Frame* f1, const Frame* f2)
+    {
+        int topDiff = f1->Top() - f2->Top();
+        bool sameLine = (topDiff > -tolerance) && (topDiff < tolerance);
+
+        if (sameLine)
+            return (f1->Right() < f2->Left());
+        else
+            return (f1->Top() < f2->Bottom() - tolerance);
+    }
+};
+
 #endif // FRAME_H
