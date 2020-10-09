@@ -43,6 +43,22 @@ namespace MathUtils
             return max;
         return val;
     }
+
+    template <typename T>
+    T Max(T a, T b)
+    {
+        if (a > b)
+            return a;
+        return b;
+    }
+
+    template <typename T>
+    T Min(T a, T b)
+    {
+        if (a < b)
+            return a;
+        return b;
+    }
 }
 
 namespace StringUtils
