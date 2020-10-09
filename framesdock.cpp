@@ -166,6 +166,7 @@ void FramesDock::OnSelectedFrameChanged(int frameIndex)
 
     MainWindowViewModel::Instance().SelectFrame(frameIndex);
 
+    EventsService::Instance().Publish(EventsTypes::SelectedFrameInList, &frameIndex);
     EventsService::Instance().Publish(EventsTypes::RedrawImage);
 }
 

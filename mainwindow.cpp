@@ -9,8 +9,8 @@
 #include <QFormLayout>
 #include <QMessageBox>
 #include <QPoint>
-#include <QScrollArea>
 #include <QCheckBox>
+#include <QScrollBar>
 #include <sstream>
 #include "mainwindowviewmodel.h"
 #include "settings.h"
@@ -29,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow),
       openAction(nullptr), exportAction(nullptr),
-      centralWidget(nullptr), spriteSheetLabel(nullptr)
+      centralWidgetScrollArea(nullptr), spriteSheetLabel(nullptr)
 {
     ui->setupUi(this);
     showMaximized();
@@ -39,6 +39,9 @@ MainWindow::MainWindow(QWidget *parent)
     CreateStatusBar();
     CreateFramesDock();
     CreateCentralWidget();
+
+    EventsService::Instance().Subscribe(EventsTypes::SelectedFrameInList,
+                                        std::bind(&MainWindow::OnSelectedFrameInList, this, std::placeholders::_1));
 }
 
 MainWindow::~MainWindow()
@@ -104,21 +107,58 @@ void MainWindow::CreateFramesDock()
 
 void MainWindow::CreateCentralWidget()
 {
-    centralWidget = new QWidget(this);
+    QWidget* centralWidget = new QWidget(this);
 
     QHBoxLayout* centralLayout = new QHBoxLayout();
 
-    QScrollArea* scrollArea = new QScrollArea(centralWidget);
-    spriteSheetLabel = new ImageLabel(scrollArea);
+    centralWidgetScrollArea = new QScrollArea(centralWidget);
+    spriteSheetLabel = new ImageLabel(centralWidgetScrollArea);
     spriteSheetLabel->setAlignment(Qt::AlignCenter);
-    scrollArea->setAlignment(Qt::AlignCenter);
-    scrollArea->setWidgetResizable(true);
-    scrollArea->setWidget(spriteSheetLabel);
-    centralLayout->addWidget(scrollArea);
+    centralWidgetScrollArea->setAlignment(Qt::AlignCenter);
+    centralWidgetScrollArea->setWidgetResizable(true);
+    centralWidgetScrollArea->setWidget(spriteSheetLabel);
+    centralLayout->addWidget(centralWidgetScrollArea);
 
     centralWidget->setLayout(centralLayout);
 
     setCentralWidget(centralWidget);
+}
+
+void MainWindow::OnSelectedFrameInList(void* data)
+{
+    if (data == nullptr)
+        return;
+
+    int* index = static_cast<int*>(data);
+    Frame* frame = MainWindowViewModel::Instance().GetFrame(*index);
+    if (frame == nullptr)
+        return;
+
+    QPoint bottomRight = spriteSheetLabel->mapToParent(QPoint(frame->Right(), frame->Bottom()));
+    QPoint topLeft = spriteSheetLabel->mapToParent(QPoint(frame->Left(), frame->Top()));
+    int rightDiff = bottomRight.x() - centralWidgetScrollArea->size().width();
+    int bottomDiff = bottomRight.y() - centralWidgetScrollArea->size().height();
+    if (rightDiff > 0)
+    {
+        auto horScrollBar = centralWidgetScrollArea->horizontalScrollBar();
+        horScrollBar->setValue(horScrollBar->value() + rightDiff + frame->Width());
+    }
+    else if (topLeft.x() < 0)
+    {
+        auto horScrollBar = centralWidgetScrollArea->horizontalScrollBar();
+        horScrollBar->setValue(horScrollBar->value() + topLeft.x() - frame->Width());
+    }
+
+    if (bottomDiff > 0)
+    {
+        auto verScrollBar = centralWidgetScrollArea->verticalScrollBar();
+        verScrollBar->setValue(verScrollBar->value() + bottomDiff + frame->Height());
+    }
+    else if (topLeft.y() < 0)
+    {
+        auto verScrollBar = centralWidgetScrollArea->verticalScrollBar();
+        verScrollBar->setValue(verScrollBar->value() + topLeft.y() - frame->Height());
+    }
 }
 
 void MainWindow::OnOpenSpriteSheet()

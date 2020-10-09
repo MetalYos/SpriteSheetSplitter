@@ -13,6 +13,7 @@ enum EventsTypes
     EndBgColorPick,
     RedrawImage,
     SelectedFrameOnImage,
+    SelectedFrameInList,
     None
 };
 

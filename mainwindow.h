@@ -11,6 +11,7 @@
 #include <QDockWidget>
 #include <QGroupBox>
 #include <QSpinBox>
+#include <QScrollArea>
 #include "frame.h"
 
 // Forward Declerations
@@ -39,7 +40,7 @@ private:
     void CreateCentralWidget();
 
     // Events Service Handles
-    void OnEndBgColorPick(void* data);
+    void OnSelectedFrameInList(void* data);
 
 private slots:
     void OnOpenSpriteSheet();
@@ -55,7 +56,7 @@ private:
     QAction* exportAction;
 
     // Central Widget
-    QWidget* centralWidget;
+    QScrollArea* centralWidgetScrollArea;
     ImageLabel* spriteSheetLabel;
 };
 #endif // MAINWINDOW_H

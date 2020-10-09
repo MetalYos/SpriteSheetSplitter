@@ -3,7 +3,7 @@ TODO:
 - Add animation support (add, remove, play).
 - Add an option to save and load settings.
 - Check why Tolerance is not working.
-- Scroll the image if selection is outside of bounds.
+- Change it so pressing on the arrow keys on the spritesheet will go up/down/left/right in the frames (OPTIONAL).
 
 DONE:
 - Add Calculate All algorithm.
@@ -11,3 +11,4 @@ DONE:
 - Add option to select background color (either a color dialog or a drop), should allow more than one bg color.
 - Fix window size when openning a large image.
 - Sort frames vector after detecting them (first x then y).
+- Scroll the image if selection is outside of bounds.
