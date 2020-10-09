@@ -16,14 +16,14 @@ FrameDetection::~FrameDetection()
 }
 
 void FrameDetection::SetParameters(const Image* imageData,
-                     const GraphicsUtils::PixelColor& backgroundColor,
+                     const std::vector<GraphicsUtils::PixelColor>& backgroundColors,
                      int tolerance)
 {
     if (!imageData)
         return;
 
     _imageData = imageData;
-    _backgroundColor = backgroundColor;
+    _backgroundColors = backgroundColors;
     _tolerance = tolerance;
 
     // Create a map that indicates if the pixel was visited or not
@@ -129,7 +129,15 @@ bool FrameDetection::DetectFrameLoop(int x, int y, std::pair<int, int>& min, std
 bool FrameDetection::IsBackgroundPixel(int x, int y) const
 {
     auto color = _imageData->GetPixelColor(x, y);
-    return !(color.A > Constants::FRAME_COLOR_TOLERANCE && color != _backgroundColor);
+
+    bool isBg = false;
+    isBg |= (color.A <= Constants::FRAME_COLOR_TOLERANCE);
+    for (auto bgColor : _backgroundColors)
+    {
+        isBg |= (color == bgColor);
+    }
+
+    return isBg;
 }
 
 bool FrameDetection::IsPixelAlreadyVisited(int x, int y) const

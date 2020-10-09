@@ -13,6 +13,9 @@
 #include <QSpinBox>
 #include "frame.h"
 
+// Forward Declerations
+class BackgroundColorListWidget;
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -43,6 +46,9 @@ private:
     void AddFrameToList(Frame* frame);
     void ClearFramesList();
 
+    // Events Service Handles
+    void OnEndBgColorPick(void* data);
+
 private slots:
     void OnOpenSpriteSheet();
     void OnImportMetaData();
@@ -69,6 +75,7 @@ private:
     QListWidget* framesList;
 
     // Calc Frames Parameters
+    BackgroundColorListWidget* bgColorListWidget;
     QSpinBox* toleranceSpinBox;
 
     // Preview Parameters

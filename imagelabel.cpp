@@ -6,16 +6,22 @@
 #include <sstream>
 #include "mainwindowviewmodel.h"
 #include "constants.h"
+#include "eventsservice.h"
+#include "qtutils.h"
 
 ImageLabel::ImageLabel(QWidget* parent) :
-    QLabel(parent), imageRaw(nullptr), image(nullptr)
+    QLabel(parent), imageRaw(nullptr), image(nullptr), _isBgColorSelectionMode(false)
 {
     mouseButtons[0] = false;
     mouseButtons[1] = false;
     mouseButtons[2] = false;
 
+    lastCursor = cursor();
     setMouseTracking(true);
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+    EventsService::Instance().Subscribe(EventsTypes::StartBgColorPick,
+                                        std::bind(&ImageLabel::OnStartBgColorPick, this, std::placeholders::_1));
 }
 
 bool ImageLabel::LoadImage(const std::string& filename)
@@ -51,6 +57,15 @@ const Image& ImageLabel::GetImage() const
     return *imageRaw;
 }
 
+void ImageLabel::OnStartBgColorPick(void* data)
+{
+    // Enable Color Selection Mode
+    _isBgColorSelectionMode = true;
+
+    // Set Cursor to be of a drip
+    QtUtils::SetCursor(this, Constants::COLOR_PICKER_CURSOR_PATH, 2, 30);
+}
+
 QSize ImageLabel::sizeHint() const
 {
     return QSize(ImageWidth(), ImageHeight());
@@ -64,16 +79,26 @@ void ImageLabel::mousePressEvent(QMouseEvent* event)
 
     if (mouseButtons[Constants::LEFT_MOUSE_BUTTON])
     {
-        lastMousePos = std::pair<int, int>(event->x(), event->y());
         bool nonSelected = true;
-        for (int i = MainWindowViewModel::Instance().GetFrames().size() - 1; i >= 0; i--)
+        lastMousePos = std::pair<int, int>(event->x(), event->y());
+        if (_isBgColorSelectionMode)
         {
-            Frame* frame = MainWindowViewModel::Instance().GetFrame(i);
-            if (frame != nullptr && frame->ContainesPoint(event->x(), event->y()))
+            // Get Color
+            auto color = imageRaw->GetPixelColor(event->x(), event->y());
+            EventsService::Instance().Publish(EventsTypes::EndBgColorPick, &color);
+            setCursor(Qt::ArrowCursor);
+        }
+        else
+        {
+            for (int i = MainWindowViewModel::Instance().GetFrames().size() - 1; i >= 0; i--)
             {
-                MainWindowViewModel::Instance().SelectFrame(i);
-                nonSelected = false;
-                break;
+                Frame* frame = MainWindowViewModel::Instance().GetFrame(i);
+                if (frame != nullptr && frame->ContainesPoint(event->x(), event->y()))
+                {
+                    MainWindowViewModel::Instance().SelectFrame(i);
+                    nonSelected = false;
+                    break;
+                }
             }
         }
 
@@ -84,6 +109,8 @@ void ImageLabel::mousePressEvent(QMouseEvent* event)
 
         update();
     }
+
+    QLabel::mousePressEvent(event);
 }
 
 void ImageLabel::mouseReleaseEvent(QMouseEvent* event)
@@ -98,7 +125,6 @@ void ImageLabel::mouseMoveEvent(QMouseEvent* event)
     if (imageRaw == nullptr)
         return;
 
-    setCursor(Qt::ArrowCursor);
     bool toUpdate = false;
 
     for (auto frame : MainWindowViewModel::Instance().GetFrames())
@@ -111,14 +137,20 @@ void ImageLabel::mouseMoveEvent(QMouseEvent* event)
                 {
                     frame->Move(event->x() - lastMousePos.first, event->y() - lastMousePos.second,
                             ImageWidth(), ImageHeight());
+                    lastCursor = cursor();
                     setCursor(Qt::DragMoveCursor);
                     toUpdate = true;
                 }
             }
             else
             {
+                lastCursor = cursor();
                 setCursor(Qt::PointingHandCursor);
             }
+        }
+        else
+        {
+            setCursor(lastCursor);
         }
     }
 

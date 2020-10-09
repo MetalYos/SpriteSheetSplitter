@@ -18,7 +18,7 @@ public:
     ~FrameDetection();
 
     void SetParameters(const Image* imageData,
-                       const GraphicsUtils::PixelColor& backgroundColor,
+                       const std::vector<GraphicsUtils::PixelColor>& backgroundColor,
                        int tolerance);
     Frame* DetectFrame(int x, int y);
     std::vector<Frame*> DetectAllFrames();
@@ -31,7 +31,7 @@ private:
 
 private:
     const Image* _imageData;
-    GraphicsUtils::PixelColor _backgroundColor;
+    std::vector<GraphicsUtils::PixelColor> _backgroundColors;
     int _tolerance;
 
     bool _areParamsSet;

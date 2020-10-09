@@ -6,6 +6,7 @@
 #include <QImage>
 #include <QMouseEvent>
 #include <QPaintEvent>
+#include <QCursor>
 #include "image.h"
 
 class ImageLabel : public QLabel
@@ -20,6 +21,8 @@ public:
     int ImageHeight() const;
 
 private:
+    void OnStartBgColorPick(void* data);
+
     QSize sizeHint() const override;
     void mousePressEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
@@ -29,9 +32,11 @@ private:
 private:
     Image* imageRaw;
     QImage* image;
+    QCursor lastCursor;
 
     bool mouseButtons[3];
     std::pair<int, int> lastMousePos;
+    bool _isBgColorSelectionMode;
 };
 
 #endif // IMAGELABEL_H

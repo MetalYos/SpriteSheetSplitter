@@ -8,12 +8,14 @@
 #include <QListWidgetItem>
 #include <QFormLayout>
 #include <QMessageBox>
+#include <QPoint>
 #include <sstream>
 #include "mainwindowviewmodel.h"
 #include "constants.h"
 #include "framedetection.h"
 #include "utils.h"
 #include "jsonhelper.h"
+#include "qtutils.h"
 #include "backgroundcolorlistwidget.h"
 
 #include <iostream>
@@ -147,8 +149,8 @@ void MainWindow::CreateCalcFrameWidget(QVBoxLayout* framesDockLayout)
 
     QVBoxLayout* mainLayout = new QVBoxLayout();
 
-    BackgroundColorListWidget* bgColorList = new BackgroundColorListWidget(this, calcFrameWidget);
-    mainLayout->addWidget(bgColorList);
+    bgColorListWidget = new BackgroundColorListWidget(this, calcFrameWidget);
+    mainLayout->addWidget(bgColorListWidget);
 
     QFormLayout* formLayout = new QFormLayout();
     toleranceSpinBox = new QSpinBox(calcFrameWidget);
@@ -235,10 +237,6 @@ void MainWindow::LoadSpriteSheet(const QString& filepath)
     {
         EnableFramesDock();
         ClearFramesList();
-
-        int tolerance = toleranceSpinBox->value();
-        GraphicsUtils::PixelColor backgroundColor(255, 255, 255, 0);
-        FrameDetection::Instance().SetParameters(&spriteSheetLabel->GetImage(), backgroundColor, tolerance);
     }
 }
 
@@ -373,6 +371,9 @@ void MainWindow::OnCalculateFrameButtonClicked()
     if (frame == nullptr)
         return;
 
+    int tolerance = toleranceSpinBox->value();
+    FrameDetection::Instance().SetParameters(&spriteSheetLabel->GetImage(),
+                                             bgColorListWidget->GetBgColors(), tolerance);
     Frame* temp = FrameDetection::Instance().DetectFrame(frame->OriginAtParentCoords().first,
                                                          frame->OriginAtParentCoords().second);
     if (temp != nullptr)
@@ -385,6 +386,10 @@ void MainWindow::OnCalculateFrameButtonClicked()
 
 void MainWindow::OnCalculateAllFramesButtonClicked()
 {
+    int tolerance = toleranceSpinBox->value();
+    FrameDetection::Instance().SetParameters(&spriteSheetLabel->GetImage(),
+                                             bgColorListWidget->GetBgColors(), tolerance);
+
     auto frames = FrameDetection::Instance().DetectAllFrames();
 
     // Clear the current list frames
