@@ -9,6 +9,7 @@
 #include <QFormLayout>
 #include <QMessageBox>
 #include <QPoint>
+#include <QScrollArea>
 #include <sstream>
 #include "mainwindowviewmodel.h"
 #include "constants.h"
@@ -180,11 +181,13 @@ void MainWindow::CreateCentralWidget()
 
     QHBoxLayout* centralLayout = new QHBoxLayout();
 
-    spriteSheetLabel = new ImageLabel(centralWidget);
+    QScrollArea* scrollArea = new QScrollArea(centralWidget);
+    spriteSheetLabel = new ImageLabel(scrollArea);
     spriteSheetLabel->setAlignment(Qt::AlignCenter);
-    centralLayout->setAlignment(spriteSheetLabel, Qt::AlignCenter);
-
-    centralLayout->addWidget(spriteSheetLabel);
+    scrollArea->setAlignment(Qt::AlignCenter);
+    scrollArea->setWidgetResizable(true);
+    scrollArea->setWidget(spriteSheetLabel);
+    centralLayout->addWidget(scrollArea);
 
     centralWidget->setLayout(centralLayout);
 

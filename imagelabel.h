@@ -12,7 +12,7 @@
 class ImageLabel : public QLabel
 {
 public:
-    ImageLabel(QWidget* parent);
+    ImageLabel(QWidget* parent = nullptr);
 
     bool LoadImage(const std::string& filename);
     const Image& GetImage() const;
