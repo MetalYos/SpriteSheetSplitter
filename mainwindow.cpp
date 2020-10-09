@@ -26,7 +26,6 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow),
       openAction(nullptr), exportAction(nullptr),
       framesWidget(nullptr), originPreviewWidget(nullptr), framesList(nullptr),
-      previewLabel(nullptr), previewPixmap(nullptr),
       centralWidget(nullptr), spriteSheetLabel(nullptr)
 {
     ui->setupUi(this);
@@ -136,9 +135,6 @@ void MainWindow::CreateFramesWidget(QDockWidget* framesDock)
     // Create the calculate frames widget
     CreateCalcFrameWidget(mainDockLayout);
 
-    // Create the preview origin widget
-    CreateOriginPreviewWidget(mainDockLayout);
-
     framesWidget->setLayout(mainDockLayout);
     framesDock->setWidget(framesWidget);
 }
@@ -176,32 +172,6 @@ void MainWindow::CreateCalcFrameWidget(QVBoxLayout* framesDockLayout)
 
     calcFrameWidget->setLayout(mainLayout);
     framesDockLayout->addWidget(calcFrameWidget);
-}
-
-void MainWindow::CreateOriginPreviewWidget(QVBoxLayout* framesDockLayout)
-{
-    originPreviewWidget = new QGroupBox(tr("Preview Origin"), framesWidget);
-    QVBoxLayout* origPrevLayout = new QVBoxLayout();
-
-    previewLabel = new QLabel(originPreviewWidget);
-    previewLabel->setFixedSize(100, 100);
-    previewLabel->setMinimumSize(100, 100);
-    previewLabel->setStyleSheet("border: 1px solid black;");
-    origPrevLayout->addWidget(previewLabel);
-
-    QSpinBox* xSpinBox = new QSpinBox(originPreviewWidget);
-    xSpinBox->setMinimum(0);
-    xSpinBox->setMaximum(10000);
-    origPrevLayout->addWidget(xSpinBox);
-
-    QSpinBox* ySpinBox = new QSpinBox(originPreviewWidget);
-    ySpinBox->setMinimum(0);
-    ySpinBox->setMaximum(10000);
-    origPrevLayout->addWidget(ySpinBox);
-
-    originPreviewWidget->setLayout(origPrevLayout);
-    originPreviewWidget->setVisible(false);
-    framesDockLayout->addWidget(originPreviewWidget);
 }
 
 void MainWindow::CreateCentralWidget()

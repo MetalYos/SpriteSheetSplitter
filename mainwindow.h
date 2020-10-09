@@ -36,7 +36,6 @@ private:
     void CreateFramesDock();
     void CreateFramesWidget(QDockWidget* framesDock);
     void CreateCalcFrameWidget(QVBoxLayout* framesDockLayout);
-    void CreateOriginPreviewWidget(QVBoxLayout* framesDockLayout);
     void CreateCentralWidget();
 
     void EnableFramesDock();
@@ -77,10 +76,6 @@ private:
     // Calc Frames Parameters
     BackgroundColorListWidget* bgColorListWidget;
     QSpinBox* toleranceSpinBox;
-
-    // Preview Parameters
-    QLabel* previewLabel;
-    QPixmap* previewPixmap;
 
     // Central Widget
     QWidget* centralWidget;
