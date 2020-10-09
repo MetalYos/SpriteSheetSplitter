@@ -1,7 +1,7 @@
-#ifndef CONSTANTS_H
-#define CONSTANTS_H
+#ifndef SETTINGS_H
+#define SETTINGS_H
 
-struct Constants
+struct Settings
 {
     enum MouseButtons
     {
@@ -17,6 +17,8 @@ struct Constants
     static const int FRAME_TOLERANCE_INIT;
     static const int FRAME_COLOR_TOLERANCE;
     static const char* COLOR_PICKER_CURSOR_PATH;
+    static const int FRAME_DETECTION_ALGO_STEP;
+    static bool FRAME_DETECTION_ALGO_USE_ADAPTIVE_STEP;
 };
 
-#endif // CONSTANTS_H
+#endif // SETTINGS_H
