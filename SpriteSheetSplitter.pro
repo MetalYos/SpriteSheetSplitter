@@ -10,6 +10,7 @@ CONFIG += c++11
 
 SOURCES += \
     backgroundcolorlistwidget.cpp \
+    constants.cpp \
     eventsservice.cpp \
     frame.cpp \
     framedetection.cpp \
@@ -20,11 +21,11 @@ SOURCES += \
     mainwindow.cpp \
     mainwindowviewmodel.cpp \
     qtutils.cpp \
-    settings.cpp \
     utils.cpp
 
 HEADERS += \
     backgroundcolorlistwidget.h \
+    constants.h \
     eventsservice.h \
     frame.h \
     framedetection.h \
@@ -34,7 +35,6 @@ HEADERS += \
     mainwindow.h \
     mainwindowviewmodel.h \
     qtutils.h \
-    settings.h \
     stb_image.h \
     utils.h
 
