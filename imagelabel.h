@@ -19,8 +19,10 @@ public:
     int ImageHeight() const;
 
 private:
+    // Event Handlers
     void OnStartBgColorPick(void* data);
     void OnRedrawImage(void* data);
+    void OnIsolateSelectedFrame(void* data);
 
     QSize sizeHint() const override;
     void mousePressEvent(QMouseEvent* event) override;
@@ -35,6 +37,7 @@ private:
     bool mouseButtons[3];
     std::pair<int, int> lastMousePos;
     bool _isBgColorSelectionMode;
+    bool _isIsolateFrameMode;
 };
 
 #endif // IMAGELABEL_H

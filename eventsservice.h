@@ -14,6 +14,7 @@ enum EventsTypes
     RedrawImage,
     SelectedFrameOnImage,
     SelectedFrameInList,
+    IsolateSelectedFrame,
     None
 };
 

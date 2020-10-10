@@ -32,6 +32,7 @@ public:
 private:
     void CreateMenu();
     void CreateFileMenu();
+    void CreateViewMenu();
     void CreateToolBar();
     void CreateStatusBar();
     void CreateFramesDock();
@@ -46,6 +47,7 @@ private slots:
     void OnOpenSpriteSheet();
     void OnImportMetaData();
     void OnExportMetaData();
+    void OnIsolateFrameToggled(bool checked);
 
 private:
     Ui::MainWindow *ui;
@@ -54,6 +56,7 @@ private:
     QAction* openAction;
     QAction* importAction;
     QAction* exportAction;
+    QAction* isolateFrameAction;
 
     // Central Widget
     QScrollArea* centralWidgetScrollArea;

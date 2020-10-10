@@ -10,7 +10,8 @@
 #include "qtutils.h"
 
 ImageLabel::ImageLabel(QWidget* parent) :
-    QLabel(parent), qimage(nullptr), _isBgColorSelectionMode(false)
+    QLabel(parent), qimage(nullptr), _isBgColorSelectionMode(false),
+    _isIsolateFrameMode(false)
 {
     mouseButtons[0] = false;
     mouseButtons[1] = false;
@@ -24,6 +25,8 @@ ImageLabel::ImageLabel(QWidget* parent) :
                                         std::bind(&ImageLabel::OnStartBgColorPick, this, std::placeholders::_1));
     EventsService::Instance().Subscribe(EventsTypes::RedrawImage,
                                         std::bind(&ImageLabel::OnRedrawImage, this, std::placeholders::_1));
+    EventsService::Instance().Subscribe(EventsTypes::IsolateSelectedFrame,
+                                        std::bind(&ImageLabel::OnIsolateSelectedFrame, this, std::placeholders::_1));
 }
 
 bool ImageLabel::LoadImage(const Image* image)
@@ -64,6 +67,16 @@ void ImageLabel::OnStartBgColorPick(void* data)
 
 void ImageLabel::OnRedrawImage(void* data)
 {
+    update();
+}
+
+void ImageLabel::OnIsolateSelectedFrame(void* data)
+{
+    if (data == nullptr)
+        return;
+
+    bool* checked = static_cast<bool*>(data);
+    _isIsolateFrameMode = *checked;
     update();
 }
 
@@ -208,6 +221,11 @@ void ImageLabel::paintEvent(QPaintEvent* event)
 
         if (selected)
             painter.setPen(QPen(Qt::yellow, 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+        else
+        {
+            if (_isIsolateFrameMode)
+                continue;
+        }
 
         painter.drawRect(frame->Left(), frame->Top(), frame->Width(), frame->Height());
         painter.fillRect(frame->Left(), frame->Top(), frame->Width(), frame->Height(),

@@ -28,7 +28,8 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow),
-      openAction(nullptr), exportAction(nullptr),
+      openAction(nullptr), exportAction(nullptr), importAction(nullptr),
+      isolateFrameAction(nullptr),
       centralWidgetScrollArea(nullptr), spriteSheetLabel(nullptr)
 {
     ui->setupUi(this);
@@ -52,6 +53,7 @@ MainWindow::~MainWindow()
 void MainWindow::CreateMenu()
 {
     CreateFileMenu();
+    CreateViewMenu();
 }
 
 void MainWindow::CreateFileMenu()
@@ -80,6 +82,19 @@ void MainWindow::CreateFileMenu()
     fileMenu->addAction(openAction);
     fileMenu->addAction(exportAction);
     fileMenu->addAction(quitAction);
+}
+
+void MainWindow::CreateViewMenu()
+{
+    isolateFrameAction = new QAction("&Isolate Frame", this);
+    isolateFrameAction->setStatusTip(tr("Isolate selected frame"));
+    isolateFrameAction->setDisabled(true);
+    isolateFrameAction->setCheckable(true);
+    connect(isolateFrameAction, &QAction::toggled, this, &MainWindow::OnIsolateFrameToggled);
+
+    QMenu* viewMenu;
+    viewMenu = menuBar()->addMenu("&View");
+    viewMenu->addAction(isolateFrameAction);
 }
 
 void MainWindow::CreateToolBar()
@@ -134,6 +149,11 @@ void MainWindow::OnSelectedFrameInList(void* data)
     if (frame == nullptr)
         return;
 
+    // Enable Isolate Frame Action if disabled
+    if (!isolateFrameAction->isEnabled())
+        isolateFrameAction->setDisabled(false);
+
+    // Change scroll bars if selected frame is outside of scroll area
     QPoint bottomRight = spriteSheetLabel->mapToParent(QPoint(frame->Right(), frame->Bottom()));
     QPoint topLeft = spriteSheetLabel->mapToParent(QPoint(frame->Left(), frame->Top()));
     int rightDiff = bottomRight.x() - centralWidgetScrollArea->size().width();
@@ -225,4 +245,9 @@ void MainWindow::OnExportMetaData()
     }
     msgBox.exec();
     statusBar()->showMessage("File was exported to " + QString(outputPath.c_str()), 3);
+}
+
+void MainWindow::OnIsolateFrameToggled(bool checked)
+{
+    EventsService::Instance().Publish(EventsTypes::IsolateSelectedFrame, &checked);
 }
