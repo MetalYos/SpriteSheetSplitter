@@ -2,6 +2,7 @@
 
 #include <QApplication>
 #include <QFile>
+#include "settings.h"
 
 int main(int argc, char *argv[])
 {
@@ -15,6 +16,9 @@ int main(int argc, char *argv[])
         QString stylesheet = QLatin1String(file.readAll());
         a.setStyleSheet(stylesheet);
     }
+
+    // Load Application Settings
+    Settings::LoadSettings();
 
     MainWindow w;
     w.show();

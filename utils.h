@@ -68,6 +68,8 @@ namespace StringUtils
     std::string GetFilename(const std::string& filepath);
     std::string GetFilenameWithoutExt(const std::string& filepath);
     std::string ReplaceFilename(const std::string& filepath, const std::string& filename);
+    std::string ToLower(const std::string& str);
+    std::string& ToLower(std::string& str);
 }
 
 #endif // UTILS_H

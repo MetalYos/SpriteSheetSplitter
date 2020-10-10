@@ -1,9 +1,9 @@
 TODO:
 - Add indication that export completed in status bar line as well.
 - Add animation support (add, remove, play).
-- Add an option to save and load settings.
 - Check why Tolerance is not working.
 - Change it so pressing on the arrow keys on the spritesheet will go up/down/left/right in the frames (OPTIONAL).
+- Add option to Isolate frame (in order to move/edit).
 
 DONE:
 - Add Calculate All algorithm.
@@ -12,3 +12,4 @@ DONE:
 - Fix window size when openning a large image.
 - Sort frames vector after detecting them (first x then y).
 - Scroll the image if selection is outside of bounds.
+- Add an option to save and load settings.

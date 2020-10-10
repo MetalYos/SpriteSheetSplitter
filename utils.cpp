@@ -1,4 +1,5 @@
 #include "utils.h"
+#include <locale>
 
 namespace StringUtils
 {
@@ -62,4 +63,19 @@ namespace StringUtils
         auto path = GetFilepathWithoutFile(filepath);
         return path + filename;
     }
+}
+
+std::string StringUtils::ToLower(const std::string& str)
+{
+    std::string strCopy = str;
+    for(char &c : strCopy)
+        c = tolower(c);
+    return strCopy;
+}
+
+std::string& StringUtils::ToLower(std::string& str)
+{
+    for(char &c : str)
+        c = tolower(c);
+    return str;
 }

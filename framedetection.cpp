@@ -6,7 +6,8 @@ FrameDetection::FrameDetection()
       _tolerance(0),
       _areParamsSet(false),
       _pixelsVisited(nullptr),
-      _steps({ Settings::FRAME_DETECTION_ALGO_STEP, Settings::FRAME_DETECTION_ALGO_STEP })
+      _steps({ Settings::GetInt(Settings::Fields::FRAME_DETECTION_ALGO_STEP),
+             Settings::GetInt(Settings::Fields::FRAME_DETECTION_ALGO_STEP) })
 {
 
 }
@@ -69,6 +70,7 @@ std::vector<Frame*> FrameDetection::DetectAllFrames()
     CreateAlreadyVisitedMatrix();
     std::vector<Frame*> frames;
 
+    bool useAdaptiveStep = Settings::GetBool(Settings::Fields::FRAME_DETECTION_ALGO_USE_ADAPTIVE_STEP);
     for (int y = _steps.second; y < _imageData->Height(); y += _steps.second)
     {
         for (int x = _steps.first; x < _imageData->Width(); x+= _steps.first)
@@ -79,7 +81,7 @@ std::vector<Frame*> FrameDetection::DetectAllFrames()
             else
             {
                 frames.push_back(frame);
-                if (Settings::FRAME_DETECTION_ALGO_USE_ADAPTIVE_STEP)
+                if (useAdaptiveStep)
                 {
                     _steps.first = frame->Width() / 4;
                     _steps.second = frame->Height() / 4;
@@ -167,7 +169,7 @@ bool FrameDetection::IsBackgroundPixel(int x, int y) const
     auto color = _imageData->GetPixelColor(x, y);
 
     bool isBg = false;
-    isBg |= (color.A <= Settings::FRAME_COLOR_TOLERANCE);
+    isBg |= (color.A <= Settings::GetInt(Settings::Fields::FRAME_COLOR_TOLERANCE));
     for (auto bgColor : _backgroundColors)
     {
         isBg |= (color == bgColor);

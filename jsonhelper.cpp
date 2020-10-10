@@ -136,8 +136,15 @@ int JsonHelper::GetIntValue(const std::string& line)
     try
     {
         return std::stoi(value);
-    }  catch (...)
+    }
+    catch (...)
     {
         return 0;
     }
+}
+
+bool JsonHelper::GetBoolValue(const std::string& line)
+{
+    std::string value = GetStringValue(line);
+    return (value == "true" || value == "True");
 }

@@ -39,7 +39,7 @@ public:
     // Frame Detection Methods
     void SetFrameDetectionParameters(int tolerance);
     void SetFrameDetectionParameters(const std::vector<GraphicsUtils::PixelColor>& backgroundColor,
-                       int tolerance = Settings::FRAME_TOLERANCE_INIT);
+                       int tolerance = Settings::GetInt(Settings::Fields::FRAME_TOLERANCE_INIT));
     bool DetectFrame();
     bool DetectAllFrames();
 

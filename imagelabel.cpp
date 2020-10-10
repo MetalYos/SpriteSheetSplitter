@@ -59,7 +59,7 @@ void ImageLabel::OnStartBgColorPick(void* data)
     _isBgColorSelectionMode = true;
 
     // Set Cursor to be of a drip
-    QtUtils::SetCursor(this, Settings::COLOR_PICKER_CURSOR_PATH, 2, 30);
+    QtUtils::SetCursor(this, Settings::GetStr(Settings::Fields::COLOR_PICKER_CURSOR_PATH).c_str(), 2, 30);
 }
 
 void ImageLabel::OnRedrawImage(void* data)

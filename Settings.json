@@ -1,0 +1,50 @@
+{
+	"NumSettings": 9,
+	"Settings": [
+		{
+			"Name": "FRAME_INIT_WIDTH",
+			"Type": "int",
+			"Value": "100"
+		},
+		{
+			"Name": "FRAME_INIT_HEIGHT",
+			"Type": "int",
+			"Value": "100"
+		},
+		{
+			"Name": "FRAME_TOLERANCE_MIN",
+			"Type": "int",
+			"Value": "0"
+		},
+		{
+			"Name": "FRAME_TOLERANCE_MAX",
+			"Type": "int",
+			"Value": "50"
+		},
+		{
+			"Name": "FRAME_TOLERANCE_INIT",
+			"Type": "int",
+			"Value": "1"
+		},
+		{
+			"Name": "FRAME_COLOR_TOLERANCE",
+			"Type": "int",
+			"Value": "3"
+		},
+		{
+			"Name": "COLOR_PICKER_CURSOR_PATH",
+			"Type": "string",
+			"Value": "color_picker_cursor.png"
+		},
+		{
+			"Name": "FRAME_DETECTION_ALGO_STEP",
+			"Type": "int",
+			"Value": "30"
+		},
+		{
+			"Name": "FRAME_DETECTION_ALGO_USE_ADAPTIVE_STEP",
+			"Type": "bool",
+			"Value": "true"
+		}
+	]
+}
