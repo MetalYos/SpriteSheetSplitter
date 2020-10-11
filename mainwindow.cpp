@@ -28,7 +28,7 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow),
-      openAction(nullptr), exportAction(nullptr), importAction(nullptr),
+      openAction(nullptr), importAction(nullptr), exportAction(nullptr),
       isolateFrameAction(nullptr),
       centralWidgetScrollArea(nullptr), spriteSheetLabel(nullptr)
 {
