@@ -135,20 +135,22 @@ bool FrameDetection::DetectFrameLoop(int x, int y, std::pair<int, int>& min, std
         if (curNumBgPixels > _tolerance)
             continue;
 
-        if (!IsBackgroundPixel(curX, curY))
+        if (curX < min.first)
+            min.first = curX;
+        if (curX > max.first)
+            max.first = curX;
+        if (curY < min.second)
+            min.second = curY;
+        if (curY > max.second)
+            max.second = curY;
+
+        if (IsBackgroundPixel(curX, curY))
         {
-            if (curX < min.first)
-                min.first = curX;
-            if (curX > max.first)
-                max.first = curX;
-            if (curY < min.second)
-                min.second = curY;
-            if (curY > max.second)
-                max.second = curY;
+            curNumBgPixels++;
         }
         else
         {
-            curNumBgPixels++;
+            curNumBgPixels = 0;
         }
 
         // Push the next coordinates to the stack

@@ -94,6 +94,8 @@ void FramesDock::CreateCalcFrameWidget(QWidget* framesWidget, QVBoxLayout* frame
     toleranceSpinBox->setMinimum(Settings::GetInt(Settings::Fields::FRAME_TOLERANCE_MIN));
     toleranceSpinBox->setMaximum(Settings::GetInt(Settings::Fields::FRAME_TOLERANCE_MAX));
     toleranceSpinBox->setValue(tolerance);
+    connect(toleranceSpinBox, QOverload<int>::of(&QSpinBox::valueChanged),
+            this, &FramesDock::OnToleranceValueChanged);
     formLayout->addRow(tr("Tolerance: "), toleranceSpinBox);
     mainLayout->addLayout(formLayout);
 

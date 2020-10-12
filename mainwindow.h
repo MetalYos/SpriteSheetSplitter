@@ -36,8 +36,6 @@ private:
     void CreateToolBar();
     void CreateStatusBar();
     void CreateFramesDock();
-    void CreateFramesWidget(QDockWidget* framesDock);
-    void CreateCalcFrameWidget(QVBoxLayout* framesDockLayout);
     void CreateCentralWidget();
 
     // Events Service Handles

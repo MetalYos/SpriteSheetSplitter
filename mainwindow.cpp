@@ -11,10 +11,9 @@
 #include <QPoint>
 #include <QCheckBox>
 #include <QScrollBar>
-#include <sstream>
+#include <QStringList>
 #include "mainwindowviewmodel.h"
 #include "settings.h"
-#include "framedetection.h"
 #include "utils.h"
 #include "jsonhelper.h"
 #include "qtutils.h"
@@ -22,6 +21,7 @@
 #include "framesdock.h"
 #include "eventsservice.h"
 
+#include <sstream>
 #include <iostream>
 #include <fstream>
 
