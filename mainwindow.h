@@ -1,18 +1,10 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "imagelabel.h"
 #include <QMainWindow>
-#include <QImage>
-#include <QPixmap>
-#include <QMouseEvent>
-#include <QListWidget>
-#include <QVBoxLayout>
-#include <QDockWidget>
-#include <QGroupBox>
-#include <QSpinBox>
-#include <QScrollArea>
-#include "frame.h"
+#include <QStackedWidget>
+#include <QAction>
+#include "frameswindow.h"
 
 // Forward Declerations
 class BackgroundColorListWidget;
@@ -32,32 +24,22 @@ public:
 private:
     void CreateMenu();
     void CreateFileMenu();
-    void CreateViewMenu();
     void CreateToolBar();
     void CreateStatusBar();
-    void CreateFramesDock();
     void CreateCentralWidget();
 
-    // Events Service Handles
-    void OnSelectedFrameInList(void* data);
-
 private slots:
-    void OnOpenSpriteSheet();
-    void OnImportMetaData();
-    void OnExportMetaData();
-    void OnIsolateFrameToggled(bool checked);
+    void OnSelectFramesView();
+    void OnSelectAnimsView();
 
 private:
     Ui::MainWindow *ui;
 
-    // Actions
-    QAction* openAction;
-    QAction* importAction;
-    QAction* exportAction;
-    QAction* isolateFrameAction;
+    QStackedWidget* mainWidget;
 
-    // Central Widget
-    QScrollArea* centralWidgetScrollArea;
-    ImageLabel* spriteSheetLabel;
+    QAction* selectFramesViewAction;
+    QAction* selectAnimsViewAction;
+
+    FramesWindow* framesWindow;
 };
 #endif // MAINWINDOW_H

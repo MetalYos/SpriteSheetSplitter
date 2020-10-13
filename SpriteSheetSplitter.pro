@@ -14,6 +14,7 @@ SOURCES += \
     frame.cpp \
     framedetection.cpp \
     framesdock.cpp \
+    frameswindow.cpp \
     image.cpp \
     imagelabel.cpp \
     jsonhelper.cpp \
@@ -30,6 +31,7 @@ HEADERS += \
     frame.h \
     framedetection.h \
     framesdock.h \
+    frameswindow.h \
     image.h \
     imagelabel.h \
     jsonhelper.h \
