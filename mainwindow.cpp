@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow),
       mainWidget(nullptr),
       selectFramesViewAction(nullptr), selectAnimsViewAction(nullptr),
-      framesWindow(nullptr)
+      framesWindow(nullptr), animsWindow(nullptr)
 {
     ui->setupUi(this);
     showMaximized();
@@ -73,7 +73,9 @@ void MainWindow::CreateCentralWidget()
 {
     mainWidget = new QStackedWidget(this);
     framesWindow = new FramesWindow(mainWidget);
+    animsWindow = new AnimationWindow(mainWidget);
     mainWidget->addWidget(framesWindow);
+    mainWidget->addWidget(animsWindow);
     mainWidget->setCurrentIndex(0);
 
     setCentralWidget(mainWidget);

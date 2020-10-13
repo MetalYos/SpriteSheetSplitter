@@ -30,11 +30,7 @@ FramesWindow::FramesWindow(QWidget *parent)
       isolateFrameAction(nullptr),
       centralWidgetScrollArea(nullptr), spriteSheetLabel(nullptr)
 {
-    setWindowFlags(Qt::Widget);
-
-    CreateToolBar();
-    CreateFramesDock();
-    CreateCentralWidget();
+    InitGui();
 
     EventsService::Instance().Subscribe(EventsTypes::SelectedFrameInList,
                                         std::bind(&FramesWindow::OnSelectedFrameInList, this, std::placeholders::_1));
@@ -43,6 +39,15 @@ FramesWindow::FramesWindow(QWidget *parent)
 FramesWindow::~FramesWindow()
 {
 
+}
+
+void FramesWindow::InitGui()
+{
+    setWindowFlags(Qt::Widget);
+
+    CreateToolBar();
+    CreateFramesDock();
+    CreateCentralWidget();
 }
 
 void FramesWindow::CreateToolBar()

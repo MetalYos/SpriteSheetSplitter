@@ -25,6 +25,8 @@ public:
     ~FramesWindow();
 
 private:
+    void InitGui();
+
     void CreateToolBar();
     void CreateFramesDock();
     void CreateCentralWidget();

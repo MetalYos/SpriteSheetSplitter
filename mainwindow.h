@@ -5,6 +5,7 @@
 #include <QStackedWidget>
 #include <QAction>
 #include "frameswindow.h"
+#include "animationwindow.h"
 
 // Forward Declerations
 class BackgroundColorListWidget;
@@ -41,5 +42,6 @@ private:
     QAction* selectAnimsViewAction;
 
     FramesWindow* framesWindow;
+    AnimationWindow* animsWindow;
 };
 #endif // MAINWINDOW_H
