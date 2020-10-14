@@ -53,6 +53,7 @@ void FramesDock::CreateFramesWidget()
     // Create list of Frames widget
     framesList = new QListWidget(this);
     framesList->setMinimumHeight(300);
+    framesList->setSelectionMode(QAbstractItemView::ExtendedSelection);
     connect(framesList, &QListWidget::currentRowChanged, this, &FramesDock::OnSelectedFrameChanged);
     mainDockLayout->addWidget(framesList);
 

@@ -6,6 +6,8 @@ TODO:
 - Add Settings window.
 - Add a Background matrix and at the start of the Calculate All Frames algorithm mark all of the pixels
 that are backgound (have a direct route to one of the image edges).
+- Add Frame editing section in the frames doxk (option to change top, left, width, height and origin).
+- Add an Add Animation button (from selected frames) - adds the frames to a new animation and changes to Animation view.
 
 DONE:
 - Add Calculate All algorithm.
@@ -17,3 +19,4 @@ DONE:
 - Add an option to save and load settings.
 - Add option to Isolate frame (in order to move/edit).
 - Check why Tolerance is not working.
+- Add option to select multiple frames using the ctrl button.
