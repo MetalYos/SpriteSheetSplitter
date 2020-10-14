@@ -4,6 +4,7 @@
 #include <QDockWidget>
 #include <QListWidget>
 #include <QVBoxLayout>
+#include <QListWidgetItem>
 #include "frame.h"
 #include "backgroundcolorlistwidget.h"
 
@@ -21,7 +22,7 @@ private:
     void ClearFramesList();
 
 private slots:
-    void OnSelectedFrameChanged(int frameIndex);
+    void OnFrameSelectionChanged();
     void OnAddFrameButtonClicked();
     void OnRemoveFrameButtonClicked();
     void OnClearFramesButtonClicked();

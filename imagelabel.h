@@ -6,6 +6,7 @@
 #include <QImage>
 #include <QMouseEvent>
 #include <QPaintEvent>
+#include <QKeyEvent>
 #include <QCursor>
 #include "image.h"
 
@@ -29,6 +30,8 @@ private:
     void mouseReleaseEvent(QMouseEvent* event) override;
     void mouseMoveEvent(QMouseEvent* event) override;
     void paintEvent(QPaintEvent* event) override;
+    void keyPressEvent(QKeyEvent* event) override;
+    void keyReleaseEvent(QKeyEvent* event) override;
 
 private:
     QImage* qimage;
@@ -38,6 +41,7 @@ private:
     std::pair<int, int> lastMousePos;
     bool _isBgColorSelectionMode;
     bool _isIsolateFrameMode;
+    bool _isCtrlPressed;
 };
 
 #endif // IMAGELABEL_H

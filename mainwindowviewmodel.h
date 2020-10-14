@@ -23,25 +23,27 @@ public:
     // Frame Methods
     void AddFrame(Frame* frame);
     void RemoveFrame(int index);
-    void RemoveSelectedFrame();
+    void RemoveSelectedFrames();
     void ClearFrames();
     void SetFrames(const std::vector<Frame*>& frames);
     Frame* GetFrame(int index);
-    Frame* GetSelectedFrame();
+    void SetSelectedFrames(const std::vector<int>& framesIndices);
+    std::vector<Frame*> GetSelectedFrames();
     std::vector<Frame*>& GetFrames();
     int GetFrameIndex(Frame* frame) const;
 
-    int GetSelectedFrameIndex() const;
-    void SelectFrame(size_t index);
+    std::vector<int> GetSelectedFrameIndices() const;
+    void SelectFrame(size_t index, bool only = true);
     void DeselectAllFrames();
-    void SelectLastFrame();
+    void SelectLastFrame(bool only = true);
+    bool IsFrameSelected(int index) const;
 
     // Frame Detection Methods
     void SetFrameDetectionParameters(int tolerance);
     void SetFrameDetectionParameters(const std::vector<GraphicsUtils::PixelColor>& backgroundColor,
                        int tolerance = Settings::GetInt(Settings::Fields::FRAME_TOLERANCE_INIT));
-    bool DetectFrame();
-    bool DetectAllFrames();
+    void DetectSelectedFrames();
+    void DetectAllFrames();
 
 
 private:
@@ -49,7 +51,7 @@ private:
 
 private:
     std::vector<Frame*> frames;
-    int selectedFrameIndex;
+    std::vector<int> selectedFrameIndices;
     Image* imageRaw;
 };
 
