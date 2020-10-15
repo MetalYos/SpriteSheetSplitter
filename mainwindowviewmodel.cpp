@@ -133,7 +133,7 @@ std::vector<int> MainWindowViewModel::GetSelectedFrameIndices() const
 
 void MainWindowViewModel::SelectFrame(size_t index, bool only)
 {
-    if (index < 0 || index > frames.size())
+    if (index > frames.size())
         return;
 
     if (only)

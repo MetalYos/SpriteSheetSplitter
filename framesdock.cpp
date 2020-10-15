@@ -277,7 +277,7 @@ void FramesDock::OnSelectedFrameOnImage(void* data)
 {
     if (data == nullptr)
     {
-        ClearFramesList();
+        framesList->clearSelection();
     }
     else
     {
