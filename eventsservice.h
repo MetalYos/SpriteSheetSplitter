@@ -8,6 +8,7 @@ typedef std::function<void(void*)> EventCallback;
 
 enum EventsTypes
 {
+    CreateAnimationPressed,
     SpriteSheetLoaded,
     StartBgColorPick,
     EndBgColorPick,

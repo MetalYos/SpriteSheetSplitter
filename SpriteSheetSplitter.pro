@@ -10,6 +10,7 @@ CONFIG += c++11
 
 SOURCES += \
     animation.cpp \
+    animationswindowviewmodel.cpp \
     animationwindow.cpp \
     backgroundcolorlistwidget.cpp \
     eventsservice.cpp \
@@ -17,18 +18,19 @@ SOURCES += \
     framedetection.cpp \
     framesdock.cpp \
     frameswindow.cpp \
+    frameswindowviewmodel.cpp \
     image.cpp \
     imagelabel.cpp \
     jsonhelper.cpp \
     main.cpp \
     mainwindow.cpp \
-    mainwindowviewmodel.cpp \
     qtutils.cpp \
     settings.cpp \
     utils.cpp
 
 HEADERS += \
     animation.h \
+    animationswindowviewmodel.h \
     animationwindow.h \
     backgroundcolorlistwidget.h \
     eventsservice.h \
@@ -36,11 +38,11 @@ HEADERS += \
     framedetection.h \
     framesdock.h \
     frameswindow.h \
+    frameswindowviewmodel.h \
     image.h \
     imagelabel.h \
     jsonhelper.h \
     mainwindow.h \
-    mainwindowviewmodel.h \
     qtutils.h \
     settings.h \
     stb_image.h \

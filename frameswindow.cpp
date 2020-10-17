@@ -11,7 +11,6 @@
 #include <QCheckBox>
 #include <QScrollBar>
 #include <QStringList>
-#include "mainwindowviewmodel.h"
 #include "settings.h"
 #include "utils.h"
 #include "jsonhelper.h"
@@ -26,8 +25,9 @@
 
 FramesWindow::FramesWindow(QWidget *parent)
     : QMainWindow(parent),
+      viewModel(FramesWindowViewModel::Instance()),
       openAction(nullptr), importAction(nullptr), exportAction(nullptr),
-      isolateFrameAction(nullptr),
+      isolateFrameAction(nullptr), createAnimAction(nullptr),
       centralWidgetScrollArea(nullptr), spriteSheetLabel(nullptr)
 {
     InitGui();
@@ -74,10 +74,16 @@ void FramesWindow::CreateToolBar()
     isolateFrameAction->setCheckable(true);
     connect(isolateFrameAction, &QAction::toggled, this, &FramesWindow::OnIsolateFrameToggled);
 
+    createAnimAction = new QAction("&Create Animation", this);
+    createAnimAction->setStatusTip(tr("Create Animation from selected frames"));
+    createAnimAction->setDisabled(true);
+    connect(createAnimAction, &QAction::triggered, this, &FramesWindow::OnCreateNewAnimation);
+
     toolBar->addAction(openAction);
     toolBar->addAction(importAction);
     toolBar->addAction(exportAction);
     toolBar->addAction(isolateFrameAction);
+    toolBar->addAction(createAnimAction);
     toolBar->setAllowedAreas(Qt::TopToolBarArea | Qt::BottomToolBarArea);
 
     addToolBar(Qt::TopToolBarArea, toolBar);
@@ -115,7 +121,7 @@ void FramesWindow::OnSelectedFrameInList(void* data)
         return;
 
     int* index = static_cast<int*>(data);
-    Frame* frame = MainWindowViewModel::Instance().GetFrame(*index);
+    Frame* frame = viewModel.GetFrame(*index);
     if (frame == nullptr)
         return;
 
@@ -161,11 +167,14 @@ void FramesWindow::OnOpenSpriteSheet()
         return;
 
     // Load image and pusblish the relevant event
-    if (MainWindowViewModel::Instance().LoadImage(fileName.toStdString()))
+    if (viewModel.LoadImage(fileName.toStdString()))
     {
-        spriteSheetLabel->LoadImage(MainWindowViewModel::Instance().GetImage());
-        MainWindowViewModel::Instance().ClearFrames();
+        spriteSheetLabel->LoadImage(viewModel.GetImage());
+        viewModel.ClearFrames();
         EventsService::Instance().Publish(EventsTypes::SpriteSheetLoaded, nullptr);
+
+        // Enable create animation action
+        createAnimAction->setDisabled(false);
     }
 }
 
@@ -182,21 +191,27 @@ void FramesWindow::OnImportMetaData()
 
     // Load the new sprite sheet image
     auto spriteSheetPath = StringUtils::ReplaceFilename(filepath.toStdString(), results.first);
-    if (MainWindowViewModel::Instance().LoadImage(spriteSheetPath))
+    if (viewModel.LoadImage(spriteSheetPath))
     {
-        spriteSheetLabel->LoadImage(MainWindowViewModel::Instance().GetImage());
-        MainWindowViewModel::Instance().SetFrames(results.second);
-        EventsService::Instance().Publish(EventsTypes::SpriteSheetLoaded, &results.second);
+        spriteSheetLabel->LoadImage(viewModel.GetImage());
+        viewModel.SetFrames(results.second);
+        std::pair<const Image*, std::vector<Frame*>> output;
+        output.first = viewModel.GetImage();
+        output.second = results.second;
+        EventsService::Instance().Publish(EventsTypes::SpriteSheetLoaded, &output);
+
+        // Enable create animation action
+        createAnimAction->setDisabled(false);
     }
 }
 
 void FramesWindow::OnExportMetaData()
 {
-    auto frames = MainWindowViewModel::Instance().GetFrames();
+    auto frames = viewModel.GetFrames();
     if (frames.size() == 0)
         return;
 
-    auto sSheetPath = MainWindowViewModel::Instance().GetImage()->Filepath();
+    auto sSheetPath = viewModel.GetImage()->Filepath();
     auto sSheetFilename = StringUtils::GetFilename(sSheetPath);
     auto sSheetName = StringUtils::GetFilenameWithoutExt(sSheetFilename);
     auto outputPath = StringUtils::GetFilepathWithoutFile(sSheetPath) + sSheetName + ".json";
@@ -217,4 +232,11 @@ void FramesWindow::OnExportMetaData()
 void FramesWindow::OnIsolateFrameToggled(bool checked)
 {
     EventsService::Instance().Publish(EventsTypes::IsolateSelectedFrame, &checked);
+}
+
+void FramesWindow::OnCreateNewAnimation()
+{
+    auto frames = viewModel.GetSelectedFrames();
+
+    EventsService::Instance().Publish(EventsTypes::CreateAnimationPressed, &frames);
 }

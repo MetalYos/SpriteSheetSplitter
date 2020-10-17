@@ -29,6 +29,9 @@ private:
     void CreateStatusBar();
     void CreateCentralWidget();
 
+    // Event handlers
+    void OnCreateAnimationPressed(void* data);
+
 private slots:
     void OnSelectFramesView();
     void OnSelectAnimsView();

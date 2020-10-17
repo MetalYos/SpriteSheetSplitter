@@ -11,6 +11,7 @@
 #include <QGroupBox>
 #include <QSpinBox>
 #include <QScrollArea>
+#include "frameswindowviewmodel.h"
 #include "frame.h"
 #include "imagelabel.h"
 
@@ -39,13 +40,17 @@ private slots:
     void OnImportMetaData();
     void OnExportMetaData();
     void OnIsolateFrameToggled(bool checked);
+    void OnCreateNewAnimation();
 
 private:
+    FramesWindowViewModel& viewModel;
+
     // Actions
     QAction* openAction;
     QAction* importAction;
     QAction* exportAction;
     QAction* isolateFrameAction;
+    QAction* createAnimAction;
 
     // Central Widget
     QScrollArea* centralWidgetScrollArea;

@@ -4,13 +4,15 @@
 #include <QPainter>
 #include <QPen>
 #include <sstream>
-#include "mainwindowviewmodel.h"
+#include "frameswindowviewmodel.h"
 #include "settings.h"
 #include "eventsservice.h"
 #include "qtutils.h"
 
 ImageLabel::ImageLabel(QWidget* parent) :
-    QLabel(parent), qimage(nullptr), _isBgColorSelectionMode(false),
+    QLabel(parent),
+    viewModel(FramesWindowViewModel::Instance()),
+    qimage(nullptr), _isBgColorSelectionMode(false),
     _isIsolateFrameMode(false), _isCtrlPressed(false)
 {
     mouseButtons[0] = false;
@@ -86,7 +88,7 @@ QSize ImageLabel::sizeHint() const
     int width = 0;
     int height = 0;
 
-    auto image = MainWindowViewModel::Instance().GetImage();
+    auto image = viewModel.GetImage();
     if (image != nullptr)
     {
         width = image->Width();
@@ -109,7 +111,7 @@ void ImageLabel::mousePressEvent(QMouseEvent* event)
         if (_isBgColorSelectionMode)
         {
             // Get Color
-            auto image = MainWindowViewModel::Instance().GetImage();
+            auto image = viewModel.GetImage();
             auto color = image->GetPixelColor(event->x(), event->y());
             EventsService::Instance().Publish(EventsTypes::EndBgColorPick, &color);
             setCursor(Qt::ArrowCursor);
@@ -117,12 +119,12 @@ void ImageLabel::mousePressEvent(QMouseEvent* event)
         }
         else
         {
-            for (int i = MainWindowViewModel::Instance().GetFrames().size() - 1; i >= 0; i--)
+            for (int i = viewModel.GetFrames().size() - 1; i >= 0; i--)
             {
-                Frame* frame = MainWindowViewModel::Instance().GetFrame(i);
+                Frame* frame = viewModel.GetFrame(i);
                 if (frame != nullptr && frame->ContainesPoint(event->x(), event->y()))
                 {
-                    MainWindowViewModel::Instance().SelectFrame(i, !_isCtrlPressed);
+                    viewModel.SelectFrame(i, !_isCtrlPressed);
                     nonSelected = false;
                     std::pair<int, bool> data { i, !_isCtrlPressed };
                     EventsService::Instance().Publish(EventsTypes::SelectedFrameOnImage, &data);
@@ -133,7 +135,7 @@ void ImageLabel::mousePressEvent(QMouseEvent* event)
 
         if (nonSelected)
         {
-            MainWindowViewModel::Instance().DeselectAllFrames();
+            viewModel.DeselectAllFrames();
             EventsService::Instance().Publish(EventsTypes::SelectedFrameOnImage);
         }
 
@@ -155,10 +157,10 @@ void ImageLabel::mouseMoveEvent(QMouseEvent* event)
     if (qimage == nullptr)
         return;
 
-    auto image = MainWindowViewModel::Instance().GetImage();
+    auto image = viewModel.GetImage();
     bool toUpdate = false;
 
-    for (auto frame : MainWindowViewModel::Instance().GetFrames())
+    for (auto frame : viewModel.GetFrames())
     {
         if (frame->ContainesPoint(event->x(), event->y()))
         {
@@ -210,12 +212,12 @@ void ImageLabel::paintEvent(QPaintEvent* event)
     QLabel::paintEvent(event);
 
     QPainter painter(this);
-    auto& frames = MainWindowViewModel::Instance().GetFrames();
+    auto& frames = viewModel.GetFrames();
 
     for (size_t i = 0; i < frames.size(); i++)
     {
         Frame* frame = frames[i];
-        bool selected = MainWindowViewModel::Instance().IsFrameSelected(i);
+        bool selected = viewModel.IsFrameSelected(i);
         auto pen = painter.pen();
 
         if (selected)

@@ -6,15 +6,15 @@
 #include "image.h"
 #include "settings.h"
 
-class MainWindowViewModel
+class FramesWindowViewModel
 {
 public:
-    static MainWindowViewModel& Instance()
+    static FramesWindowViewModel& Instance()
     {
-        static MainWindowViewModel instance;
+        static FramesWindowViewModel instance;
         return instance;
     }
-    ~MainWindowViewModel();
+    ~FramesWindowViewModel();
 
     // Image Methods
     bool LoadImage(const std::string& filepath);
@@ -47,7 +47,7 @@ public:
 
 
 private:
-    MainWindowViewModel();
+    FramesWindowViewModel();
 
 private:
     std::vector<Frame*> frames;

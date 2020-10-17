@@ -6,7 +6,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <vector>
-#include "mainwindow.h"
+#include "frameswindowviewmodel.h"
 #include "utils.h"
 
 class BackgroundColorListWidget : public QWidget
@@ -31,6 +31,8 @@ private slots:
     void OnSelectBgColorClicked();
 
 private:
+    FramesWindowViewModel& viewModel;
+
     struct RowWidget
     {
         QHBoxLayout* Layout;

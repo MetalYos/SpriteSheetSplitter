@@ -11,18 +11,19 @@ public:
     {
         PLAYING,
         PAUSED,
-        STOPPED,
-        START
+        STOPPED
     };
 
 public:
     Animation();
+    Animation(const std::vector<Frame*>& frames);
     ~Animation();
 
     bool IsLooped() const;
     void SetLooped(bool isLooped);
 
     AnimationStates GetState() const;
+    void SetState(AnimationStates state);
 
 private:
     std::vector<Frame*> frames;

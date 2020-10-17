@@ -1,18 +1,18 @@
-#include "mainwindowviewmodel.h"
+#include "frameswindowviewmodel.h"
 #include "framedetection.h"
 #include <algorithm>
 
-MainWindowViewModel::MainWindowViewModel()
+FramesWindowViewModel::FramesWindowViewModel()
 {
 
 }
 
-MainWindowViewModel::~MainWindowViewModel()
+FramesWindowViewModel::~FramesWindowViewModel()
 {
     ClearFrames();
 }
 
-bool MainWindowViewModel::LoadImage(const std::string& filepath)
+bool FramesWindowViewModel::LoadImage(const std::string& filepath)
 {
     if (imageRaw != nullptr)
         delete imageRaw;
@@ -25,18 +25,18 @@ bool MainWindowViewModel::LoadImage(const std::string& filepath)
     return true;
 }
 
-const Image* MainWindowViewModel::GetImage() const
+const Image* FramesWindowViewModel::GetImage() const
 {
     return imageRaw;
 }
 
-void MainWindowViewModel::AddFrame(Frame* frame)
+void FramesWindowViewModel::AddFrame(Frame* frame)
 {
     frames.push_back(frame);
     SelectLastFrame();
 }
 
-void MainWindowViewModel::RemoveFrame(int index)
+void FramesWindowViewModel::RemoveFrame(int index)
 {
     if (index < 0 || index >= (int)frames.size())
         return;
@@ -54,7 +54,7 @@ void MainWindowViewModel::RemoveFrame(int index)
     }
 }
 
-void MainWindowViewModel::RemoveSelectedFrames()
+void FramesWindowViewModel::RemoveSelectedFrames()
 {
     while (selectedFrameIndices.size() > 0)
     {
@@ -64,7 +64,7 @@ void MainWindowViewModel::RemoveSelectedFrames()
     }
 }
 
-void MainWindowViewModel::ClearFrames()
+void FramesWindowViewModel::ClearFrames()
 {
     while (frames.size() > 0)
     {
@@ -76,7 +76,7 @@ void MainWindowViewModel::ClearFrames()
     selectedFrameIndices.clear();
 }
 
-void MainWindowViewModel::SetFrames(const std::vector<Frame*>& frames)
+void FramesWindowViewModel::SetFrames(const std::vector<Frame*>& frames)
 {
     if (frames.size() == 0)
         return;
@@ -88,7 +88,7 @@ void MainWindowViewModel::SetFrames(const std::vector<Frame*>& frames)
     selectedFrameIndices.push_back(0);
 }
 
-Frame* MainWindowViewModel::GetFrame(int index)
+Frame* FramesWindowViewModel::GetFrame(int index)
 {
     if (index < 0 || index >= (int)frames.size())
         return nullptr;
@@ -96,12 +96,12 @@ Frame* MainWindowViewModel::GetFrame(int index)
     return frames[index];
 }
 
-std::vector<Frame*>& MainWindowViewModel::GetFrames()
+std::vector<Frame*>& FramesWindowViewModel::GetFrames()
 {
     return frames;
 }
 
-int MainWindowViewModel::GetFrameIndex(Frame* frame) const
+int FramesWindowViewModel::GetFrameIndex(Frame* frame) const
 {
     for (size_t i = 0; i < frames.size(); i++)
     {
@@ -111,12 +111,12 @@ int MainWindowViewModel::GetFrameIndex(Frame* frame) const
     return 0;
 }
 
-void MainWindowViewModel::SetSelectedFrames(const std::vector<int>& framesIndices)
+void FramesWindowViewModel::SetSelectedFrames(const std::vector<int>& framesIndices)
 {
     selectedFrameIndices = framesIndices;
 }
 
-std::vector<Frame*> MainWindowViewModel::GetSelectedFrames()
+std::vector<Frame*> FramesWindowViewModel::GetSelectedFrames()
 {
     std::vector<Frame*> output;
 
@@ -126,12 +126,12 @@ std::vector<Frame*> MainWindowViewModel::GetSelectedFrames()
     return output;
 }
 
-std::vector<int> MainWindowViewModel::GetSelectedFrameIndices() const
+std::vector<int> FramesWindowViewModel::GetSelectedFrameIndices() const
 {
     return selectedFrameIndices;
 }
 
-void MainWindowViewModel::SelectFrame(size_t index, bool only)
+void FramesWindowViewModel::SelectFrame(size_t index, bool only)
 {
     if (index > frames.size())
         return;
@@ -143,19 +143,19 @@ void MainWindowViewModel::SelectFrame(size_t index, bool only)
         selectedFrameIndices.push_back(index);
 }
 
-void MainWindowViewModel::DeselectAllFrames()
+void FramesWindowViewModel::DeselectAllFrames()
 {
     selectedFrameIndices.clear();
 }
 
-void MainWindowViewModel::SelectLastFrame(bool only)
+void FramesWindowViewModel::SelectLastFrame(bool only)
 {
     if (only)
         selectedFrameIndices.clear();
     selectedFrameIndices.push_back(frames.size() - 1);
 }
 
-bool MainWindowViewModel::IsFrameSelected(int index) const
+bool FramesWindowViewModel::IsFrameSelected(int index) const
 {
     for (auto i : selectedFrameIndices)
     {
@@ -165,18 +165,18 @@ bool MainWindowViewModel::IsFrameSelected(int index) const
     return false;
 }
 
-void MainWindowViewModel::SetFrameDetectionParameters(int tolerance)
+void FramesWindowViewModel::SetFrameDetectionParameters(int tolerance)
 {
     FrameDetection::Instance().SetImageData(imageRaw);
     FrameDetection::Instance().SetTolerance(tolerance);
 }
 
-void MainWindowViewModel::SetFrameDetectionParameters(const std::vector<GraphicsUtils::PixelColor>& backgroundColor, int tolerance)
+void FramesWindowViewModel::SetFrameDetectionParameters(const std::vector<GraphicsUtils::PixelColor>& backgroundColor, int tolerance)
 {
     FrameDetection::Instance().SetParameters(imageRaw, backgroundColor, tolerance);
 }
 
-void MainWindowViewModel::DetectSelectedFrames()
+void FramesWindowViewModel::DetectSelectedFrames()
 {
     if (imageRaw == nullptr)
         return;
@@ -195,7 +195,7 @@ void MainWindowViewModel::DetectSelectedFrames()
     }
 }
 
-void MainWindowViewModel::DetectAllFrames()
+void FramesWindowViewModel::DetectAllFrames()
 {
     if (imageRaw == nullptr)
         return;

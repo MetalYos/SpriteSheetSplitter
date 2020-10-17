@@ -5,6 +5,7 @@
 #include <QListWidget>
 #include <QVBoxLayout>
 #include <QListWidgetItem>
+#include "frameswindowviewmodel.h"
 #include "frame.h"
 #include "backgroundcolorlistwidget.h"
 
@@ -37,6 +38,8 @@ private:
     void OnToleranceValueChanged(int i);
 
 private:
+    FramesWindowViewModel& viewModel;
+
     QListWidget* framesList;
     QWidget* stepsWidget;
     BackgroundColorListWidget* bgColorListWidget;

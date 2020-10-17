@@ -8,6 +8,7 @@
 #include <QPaintEvent>
 #include <QKeyEvent>
 #include <QCursor>
+#include "frameswindowviewmodel.h"
 #include "image.h"
 
 class ImageLabel : public QLabel
@@ -34,6 +35,8 @@ private:
     void keyReleaseEvent(QKeyEvent* event) override;
 
 private:
+    FramesWindowViewModel& viewModel;
+
     QImage* qimage;
     QCursor lastCursor;
 

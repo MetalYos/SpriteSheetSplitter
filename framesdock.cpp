@@ -12,16 +12,16 @@
 #include <functional>
 #include "backgroundcolorlistwidget.h"
 #include "settings.h"
-#include "mainwindowviewmodel.h"
 #include "eventsservice.h"
 #include "framedetection.h"
 
 FramesDock::FramesDock(const QString& title, QWidget* parent)
     : QDockWidget(title, parent),
+      viewModel(FramesWindowViewModel::Instance()),
       tolerance(Settings::GetInt(Settings::Fields::FRAME_TOLERANCE_INIT))
 {
     InitGui();
-    MainWindowViewModel::Instance().SetFrameDetectionParameters(bgColorListWidget->GetBgColors(), tolerance);
+    viewModel.SetFrameDetectionParameters(bgColorListWidget->GetBgColors(), tolerance);
 
     // Subscribe to relevant events
     EventsService::Instance().Subscribe(EventsTypes::SpriteSheetLoaded,
@@ -161,7 +161,7 @@ void FramesDock::AddFrameToList(int index)
 
 void FramesDock::ClearFramesList()
 {
-    MainWindowViewModel::Instance().ClearFrames();
+    viewModel.ClearFrames();
     framesList->clear();
 }
 
@@ -170,7 +170,7 @@ void FramesDock::OnFrameSelectionChanged()
     auto selectedFrames = framesList->selectedItems();
     if (selectedFrames.size() == 0)
     {
-        MainWindowViewModel::Instance().DeselectAllFrames();
+        viewModel.DeselectAllFrames();
         return;
     }
 
@@ -181,13 +181,13 @@ void FramesDock::OnFrameSelectionChanged()
         selectedIndices.push_back(frameIndex);
         EventsService::Instance().Publish(EventsTypes::SelectedFrameInList, &frameIndex);
     }
-    MainWindowViewModel::Instance().SetSelectedFrames(selectedIndices);
+    viewModel.SetSelectedFrames(selectedIndices);
     EventsService::Instance().Publish(EventsTypes::RedrawImage);
 }
 
 void FramesDock::OnAddFrameButtonClicked()
 {
-    auto image = MainWindowViewModel::Instance().GetImage();
+    auto image = viewModel.GetImage();
     if (image == nullptr)
         return;
 
@@ -198,13 +198,13 @@ void FramesDock::OnAddFrameButtonClicked()
 
     Frame* frame = new Frame(top, left, frameInitWidth, frameInitHeight);
 
-    MainWindowViewModel::Instance().AddFrame(frame);
-    AddFrameToList(MainWindowViewModel::Instance().GetFrames().size());
+    viewModel.AddFrame(frame);
+    AddFrameToList(viewModel.GetFrames().size());
 }
 
 void FramesDock::OnRemoveFrameButtonClicked()
 {
-    auto selectedFrames = MainWindowViewModel::Instance().GetSelectedFrames();
+    auto selectedFrames = viewModel.GetSelectedFrames();
 
     // Remove the selected frame from the list
     auto items = framesList->selectedItems();
@@ -215,7 +215,7 @@ void FramesDock::OnRemoveFrameButtonClicked()
     }
 
     // Remove the selected frame
-    MainWindowViewModel::Instance().RemoveSelectedFrames();
+    viewModel.RemoveSelectedFrames();
 
     if (framesList->count() > 0)
         framesList->setCurrentRow(framesList->count() - 1);
@@ -227,7 +227,7 @@ void FramesDock::OnClearFramesButtonClicked()
     framesList->clear();
 
     // Clear frames list
-    MainWindowViewModel::Instance().ClearFrames();
+    viewModel.ClearFrames();
 
     EventsService::Instance().Publish(EventsTypes::RedrawImage);
 }
@@ -243,14 +243,14 @@ void FramesDock::OnUseAdaptiveStepCheckboxStateChanged(int state)
 void FramesDock::OnCalculateFrameButtonClicked()
 {
 
-    MainWindowViewModel::Instance().DetectSelectedFrames();
+    viewModel.DetectSelectedFrames();
     EventsService::Instance().Publish(EventsTypes::RedrawImage);
 }
 
 void FramesDock::OnCalculateAllFramesButtonClicked()
 {
-    MainWindowViewModel::Instance().DetectAllFrames();
-    for (size_t i = 0; i < MainWindowViewModel::Instance().GetFrames().size(); i++)
+    viewModel.DetectAllFrames();
+    for (size_t i = 0; i < viewModel.GetFrames().size(); i++)
         AddFrameToList(i + 1);
 }
 
@@ -262,8 +262,8 @@ void FramesDock::OnSpriteSheetLoaded(void* data)
     // Load frames into list if available
     if (data != nullptr)
     {
-        auto frames = static_cast<std::vector<Frame*>*>(data);
-        for (size_t i = 0; i < frames->size(); i++)
+        auto input = static_cast<std::pair<const Image*, std::vector<Frame*>>*>(data);
+        for (size_t i = 0; i < input->second.size(); i++)
             AddFrameToList(i + 1);
     }
 
@@ -291,5 +291,5 @@ void FramesDock::OnSelectedFrameOnImage(void* data)
 void FramesDock::OnToleranceValueChanged(int i)
 {
     tolerance = i;
-    MainWindowViewModel::Instance().SetFrameDetectionParameters(i);
+    viewModel.SetFrameDetectionParameters(i);
 }

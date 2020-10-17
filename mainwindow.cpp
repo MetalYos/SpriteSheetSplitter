@@ -9,6 +9,7 @@
 #include <sstream>
 #include <iostream>
 #include <fstream>
+#include <functional>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -24,6 +25,9 @@ MainWindow::MainWindow(QWidget *parent)
     CreateToolBar();
     CreateStatusBar();
     CreateCentralWidget();
+
+    EventsService::Instance().Subscribe(EventsTypes::CreateAnimationPressed,
+                                        std::bind(&MainWindow::OnCreateAnimationPressed, this, std::placeholders::_1));
 }
 
 MainWindow::~MainWindow()
@@ -79,6 +83,11 @@ void MainWindow::CreateCentralWidget()
     mainWidget->setCurrentIndex(0);
 
     setCentralWidget(mainWidget);
+}
+
+void MainWindow::OnCreateAnimationPressed(void* data)
+{
+    mainWidget->setCurrentIndex(1);
 }
 
 void MainWindow::OnSelectFramesView()
