@@ -25,10 +25,19 @@ public:
     AnimationStates GetState() const;
     void SetState(AnimationStates state);
 
+    int GetCurrentFrameIndex() const;
+    Frame* GetCurrentFrame() const;
+    size_t GetNumberOfFrames() const;
+
+    void GoToStart();
+    void GoToEnd();
+    void GoToNextFrame();
+    void GoToPreviousFrame();
+
 private:
     std::vector<Frame*> frames;
     bool isLooped;
-    Frame* currentFrame;
+    int currentFrameIndex;
     AnimationStates currentState;
 };
 
