@@ -17,7 +17,6 @@
 #include "qtutils.h"
 #include "backgroundcolorlistwidget.h"
 #include "framesdock.h"
-#include "eventsservice.h"
 
 #include <sstream>
 #include <iostream>
@@ -244,6 +243,12 @@ void FramesWindow::OnIsolateFrameToggled(bool checked)
 void FramesWindow::OnCreateNewAnimation()
 {
     auto frames = viewModel.GetSelectedFrames();
+    if (frames.size() == 0)
+    {
+        QMessageBox msgBox;
+        msgBox.setText("You must select at least one frame!");
+        return;
+    }
 
     CreateAnimationPressedParams params;
     params.Frames = frames;
