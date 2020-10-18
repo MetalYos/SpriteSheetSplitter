@@ -6,17 +6,23 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QPixmap>
+#include <QFont>
 #include <functional>
+#include <sstream>
 #include "eventsservice.h"
+#include "settings.h"
 
 AnimationWindow::AnimationWindow(QWidget *parent) :
     QMainWindow(parent),
     viewModel(AnimationsWindowViewModel::Instance()),
-    animsList(nullptr), centralWidgetScrollArea(nullptr),
-    imageLabel(nullptr), qimage(nullptr),
-    image(nullptr)
+    animsList(nullptr), titleLabel(nullptr),
+    centralWidgetScrollArea(nullptr),
+    imageLabel(nullptr), qimage(nullptr)
 {
     InitGui();
+
+    timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, QOverload<>::of(&AnimationWindow::OnTimeout));
 
     EventsService::Instance().Subscribe(EventsTypes::CreateAnimationPressed,
                                         std::bind(&AnimationWindow::OnCreateAnimationPressed, this, std::placeholders::_1));
@@ -105,7 +111,13 @@ void AnimationWindow::CreatePlayControlsWidget(QDockWidget* timelineDock)
 void AnimationWindow::CreateCentralWidget()
 {
     QWidget* centralWidget = new QWidget(this);
-    QHBoxLayout* centralLayout = new QHBoxLayout();
+    QVBoxLayout* centralLayout = new QVBoxLayout();
+
+    titleLabel = new QLabel(centralWidget);
+    QFont sansFont("Helvetica [Cronyx]", 12);
+    titleLabel->setFont(sansFont);
+    titleLabel->setText(tr("No Animation selected..."));
+    centralLayout->addWidget(titleLabel);
 
     centralWidgetScrollArea = new QScrollArea(centralWidget);
     imageLabel = new QLabel(centralWidgetScrollArea);
@@ -119,65 +131,102 @@ void AnimationWindow::CreateCentralWidget()
     setCentralWidget(centralWidget);
 }
 
-bool AnimationWindow::LoadImage(const Image* image, Frame* frame)
+bool AnimationWindow::SetFrameImage()
 {
-    if (image == nullptr)
+    auto frame = viewModel.GetSelectedAnimation()->GetCurrentFrame();
+    auto image = viewModel.GetImage();
+
+    if (image == nullptr || frame == nullptr)
         return false;
 
     if (image != nullptr)
     {
-        int startIndex = frame->Top() * image->BytesPerLine() + frame->Left();
+        int startIndex = frame->Top() * image->BytesPerLine() + frame->Left() * image->NumOfChannels();
 
-        QImage* temp = new QImage(image->Pixels() + startIndex - 2,
+        QImage* temp = new QImage(image->Pixels() + startIndex,
                            frame->Width(),
                            frame->Height(),
                            image->BytesPerLine(),
                            QImage::Format_ARGB32);
+
+        if (qimage != nullptr)
+            delete qimage;
+
         qimage = new QImage(temp->rgbSwapped());
         delete temp;
+
         QPixmap pixmap = QPixmap::fromImage(*qimage);
         pixmap.scaled(size(), Qt::KeepAspectRatio);
         imageLabel->setPixmap(pixmap);
-        imageLabel->setStyleSheet("border: 1px solid black;");
+
+        std::stringstream ss;
+        ss << "Frame " << viewModel.GetSelectedAnimation()->GetCurrentFrameIndex() + 1 <<
+              " out of " << viewModel.GetSelectedAnimation()->GetNumberOfFrames();
+        titleLabel->setText(ss.str().c_str());
 
         return true;
     }
     return false;
 }
 
+void AnimationWindow::AddAnimationToList(int index)
+{
+    std::stringstream ss;
+    ss << "Animation " << index + 1;
+    animsList->addItem(ss.str().c_str());
+
+    animsList->clearSelection();
+    animsList->setCurrentRow(index);
+}
+
 void AnimationWindow::OnGoToStartPressed()
 {
-
+    viewModel.GoToStart();
+    SetFrameImage();
 }
 
 void AnimationWindow::OnGoToEndPressed()
 {
-
+    viewModel.GoToEnd();
+    SetFrameImage();
 }
 
 void AnimationWindow::OnPrevFramePressed()
 {
-
+    viewModel.GoToPreviousFrame();
+    SetFrameImage();
 }
 
 void AnimationWindow::OnNextFramePressed()
 {
-
+    viewModel.GoToNextFrame();
+    SetFrameImage();
 }
 
 void AnimationWindow::OnPlayPausePressed()
 {
-    if (viewModel.GetAnimationState() == Animation::AnimationStates::PLAYING ||
+    if (viewModel.GetAnimationState() == Animation::AnimationStates::PAUSED ||
             viewModel.GetAnimationState() == Animation::AnimationStates::STOPPED)
     {
-        viewModel.SetAnimationState(Animation::AnimationStates::PAUSED);
+        viewModel.SetAnimationState(Animation::AnimationStates::PLAYING);
         playPauseButton->setText("||");
+
+        int duration = 1000 * (1.0 / Settings::GetInt(Settings::Fields::ANIMATION_FPS));
+        timer->start(duration);
     }
     else
     {
-        viewModel.SetAnimationState(Animation::AnimationStates::PLAYING);
+        viewModel.SetAnimationState(Animation::AnimationStates::PAUSED);
         playPauseButton->setText(">");
+
+        timer->stop();
     }
+}
+
+void AnimationWindow::OnTimeout()
+{
+    viewModel.Update();
+    SetFrameImage();
 }
 
 void AnimationWindow::OnSpriteSheetLoaded(EventParams& data)
@@ -186,7 +235,7 @@ void AnimationWindow::OnSpriteSheetLoaded(EventParams& data)
     if (params.SpriteSheetImage == nullptr)
         return;
 
-    image = params.SpriteSheetImage;
+    viewModel.SetImage(params.SpriteSheetImage);
 }
 
 void AnimationWindow::OnCreateAnimationPressed(EventParams& data)
@@ -195,6 +244,6 @@ void AnimationWindow::OnCreateAnimationPressed(EventParams& data)
     Animation* anim = new Animation(params.Frames);
     viewModel.AddAnimation(anim);
 
-    if (params.Frames.size() > 0)
-        LoadImage(image, (params.Frames)[0]);
+    AddAnimationToList(viewModel.GetSelectedAnimationIndex());
+    SetFrameImage();
 }

@@ -8,6 +8,7 @@
 #include <QListWidget>
 #include <QScrollArea>
 #include <QLabel>
+#include <QTimer>
 #include "eventsservice.h"
 #include "animationswindowviewmodel.h"
 #include "image.h"
@@ -26,7 +27,9 @@ private:
     void CreatePlayControlsWidget(QDockWidget* timelineDock);
     void CreateCentralWidget();
 
-    bool LoadImage(const Image* image, Frame* frame);
+    bool SetFrameImage();
+    void SetFrameLabel();
+    void AddAnimationToList(int index);
 
     // Event Handles
     void OnSpriteSheetLoaded(EventParams& data);
@@ -38,16 +41,19 @@ private slots:
     void OnPrevFramePressed();
     void OnNextFramePressed();
     void OnPlayPausePressed();
+    void OnTimeout();
 
 private:
     AnimationsWindowViewModel& viewModel;
     QPushButton* playPauseButton;
     QListWidget* animsList;
 
+    QLabel* titleLabel;
     QScrollArea* centralWidgetScrollArea;
     QLabel* imageLabel;
     QImage* qimage;
-    const Image* image;
+
+    QTimer* timer;
 };
 
 #endif // ANIMATIONWINDOW_H
