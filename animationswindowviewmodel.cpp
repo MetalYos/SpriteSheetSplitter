@@ -3,14 +3,22 @@
 AnimationsWindowViewModel::AnimationsWindowViewModel()
     : selectedAnimIndex(-1)
 {
-    Animation* tempAnimation = new Animation();
-    AddAnimation(tempAnimation);
-    SetAnimationState(Animation::AnimationStates::STOPPED);
+
 }
 
 AnimationsWindowViewModel::~AnimationsWindowViewModel()
 {
     ClearAnimations();
+}
+
+void AnimationsWindowViewModel::SetImage(const Image* image)
+{
+    this->image = image;
+}
+
+const Image* AnimationsWindowViewModel::GetImage() const
+{
+    return image;
 }
 
 void AnimationsWindowViewModel::AddAnimation(Animation* anim)
@@ -73,6 +81,11 @@ Animation* AnimationsWindowViewModel::GetSelectedAnimation()
     return GetAnimation(selectedAnimIndex);
 }
 
+int AnimationsWindowViewModel::GetSelectedAnimationIndex()
+{
+    return selectedAnimIndex;
+}
+
 std::vector<Animation*>& AnimationsWindowViewModel::GetAnimations()
 {
     return animations;
@@ -121,4 +134,36 @@ Animation::AnimationStates AnimationsWindowViewModel::GetAnimationState() const
         return Animation::AnimationStates::STOPPED;
     else
         return animations[selectedAnimIndex]->GetState();
+}
+
+void AnimationsWindowViewModel::GoToStart()
+{
+    GetSelectedAnimation()->GoToStart();
+}
+
+void AnimationsWindowViewModel::GoToEnd()
+{
+    GetSelectedAnimation()->GoToEnd();
+}
+
+void AnimationsWindowViewModel::GoToPreviousFrame()
+{
+    GetSelectedAnimation()->GoToPreviousFrame();
+}
+
+void AnimationsWindowViewModel::GoToNextFrame()
+{
+    GetSelectedAnimation()->GoToNextFrame();
+}
+
+void AnimationsWindowViewModel::Update()
+{
+    auto anim = GetSelectedAnimation();
+    if (anim == nullptr)
+        return;
+
+    if (anim->GetState() == Animation::AnimationStates::PLAYING)
+    {
+        anim->GoToNextFrame();
+    }
 }

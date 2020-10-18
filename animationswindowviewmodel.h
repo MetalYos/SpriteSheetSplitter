@@ -2,6 +2,7 @@
 #define ANIMATIONSWINDOWVIEWMODEL_H
 
 #include "animation.h"
+#include "image.h"
 #include <vector>
 
 class AnimationsWindowViewModel
@@ -14,6 +15,9 @@ public:
     }
     ~AnimationsWindowViewModel();
 
+    void SetImage(const Image* image);
+    const Image* GetImage() const;
+
     // Animation Viewer Methods
 
     // Animations Methods
@@ -24,6 +28,7 @@ public:
     Animation* GetAnimation(int index);
     void SelectAnimation(int index);
     Animation* GetSelectedAnimation();
+    int GetSelectedAnimationIndex();
     std::vector<Animation*>& GetAnimations();
     int GetAnimationIndex(Animation* animation) const;
     void DelesectAllAnimations();
@@ -34,6 +39,11 @@ public:
     // Animation Control Methods
     void SetAnimationState(Animation::AnimationStates state);
     Animation::AnimationStates GetAnimationState() const;
+    void GoToStart();
+    void GoToEnd();
+    void GoToPreviousFrame();
+    void GoToNextFrame();
+    void Update();
 
 private:
     AnimationsWindowViewModel();
@@ -41,6 +51,7 @@ private:
 private:
     std::vector<Animation*> animations;
     int selectedAnimIndex;
+    const Image* image;
 };
 
 #endif // ANIMATIONSWINDOWVIEWMODEL_H
