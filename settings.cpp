@@ -14,7 +14,8 @@ std::map<std::string, Settings::Fields> Settings::fieldNamesMap = {
     { "FRAME_COLOR_TOLERANCE", Settings::Fields::FRAME_COLOR_TOLERANCE },
     { "COLOR_PICKER_CURSOR_PATH", Settings::Fields::COLOR_PICKER_CURSOR_PATH },
     { "FRAME_DETECTION_ALGO_STEP", Settings::Fields::FRAME_DETECTION_ALGO_STEP },
-    { "FRAME_DETECTION_ALGO_USE_ADAPTIVE_STEP", Settings::Fields::FRAME_DETECTION_ALGO_USE_ADAPTIVE_STEP }
+    { "FRAME_DETECTION_ALGO_USE_ADAPTIVE_STEP", Settings::Fields::FRAME_DETECTION_ALGO_USE_ADAPTIVE_STEP },
+    { "ANIMATION_FPS", Settings::Fields::ANIMATION_FPS }
 };
 std::unordered_map<Settings::FieldKey, Settings::FieldValue, Settings::FieldKeyHash> Settings::settings;
 

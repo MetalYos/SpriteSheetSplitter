@@ -1,5 +1,5 @@
 {
-	"NumSettings": 9,
+	"NumSettings": 10,
 	"Settings": [
 		{
 			"Name": "FRAME_INIT_WIDTH",
@@ -45,6 +45,11 @@
 			"Name": "FRAME_DETECTION_ALGO_USE_ADAPTIVE_STEP",
 			"Type": "bool",
 			"Value": "true"
+		},
+		{
+			"Name": "ANIMATION_FPS",
+			"Type": "int",
+			"Value": "60"
 		}
 	]
 }
