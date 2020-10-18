@@ -59,7 +59,7 @@ bool ImageLabel::LoadImage(const Image* image)
     return false;
 }
 
-void ImageLabel::OnStartBgColorPick(void* data)
+void ImageLabel::OnStartBgColorPick(EventParams& data)
 {
     // Enable Color Selection Mode
     _isBgColorSelectionMode = true;
@@ -68,18 +68,15 @@ void ImageLabel::OnStartBgColorPick(void* data)
     QtUtils::SetCursor(this, Settings::GetStr(Settings::Fields::COLOR_PICKER_CURSOR_PATH).c_str(), 2, 30);
 }
 
-void ImageLabel::OnRedrawImage(void* data)
+void ImageLabel::OnRedrawImage(EventParams& data)
 {
     update();
 }
 
-void ImageLabel::OnIsolateSelectedFrame(void* data)
+void ImageLabel::OnIsolateSelectedFrame(EventParams& data)
 {
-    if (data == nullptr)
-        return;
-
-    bool* checked = static_cast<bool*>(data);
-    _isIsolateFrameMode = *checked;
+    IsolateSelectedFrameParams& params = dynamic_cast<IsolateSelectedFrameParams&>(data);
+    _isIsolateFrameMode = params.Isolate;
     update();
 }
 
@@ -113,7 +110,9 @@ void ImageLabel::mousePressEvent(QMouseEvent* event)
             // Get Color
             auto image = viewModel.GetImage();
             auto color = image->GetPixelColor(event->x(), event->y());
-            EventsService::Instance().Publish(EventsTypes::EndBgColorPick, &color);
+            EndBgColorPickParams params;
+            params.Color = color;
+            EventsService::Instance().Publish(EventsTypes::EndBgColorPick, params);
             setCursor(Qt::ArrowCursor);
             _isBgColorSelectionMode = false;
         }
@@ -126,8 +125,11 @@ void ImageLabel::mousePressEvent(QMouseEvent* event)
                 {
                     viewModel.SelectFrame(i, !_isCtrlPressed);
                     nonSelected = false;
-                    std::pair<int, bool> data { i, !_isCtrlPressed };
-                    EventsService::Instance().Publish(EventsTypes::SelectedFrameOnImage, &data);
+
+                    SelectedFrameOnImageParams params;
+                    params.FrameIndex = i;
+                    params.IsCtrlPressed = _isCtrlPressed;
+                    EventsService::Instance().Publish(EventsTypes::SelectedFrameOnImage, params);
                     break;
                 }
             }
@@ -136,7 +138,10 @@ void ImageLabel::mousePressEvent(QMouseEvent* event)
         if (nonSelected)
         {
             viewModel.DeselectAllFrames();
-            EventsService::Instance().Publish(EventsTypes::SelectedFrameOnImage);
+
+            SelectedFrameOnImageParams params;
+            params.FrameIndex = -1;
+            EventsService::Instance().Publish(EventsTypes::SelectedFrameOnImage, params);
         }
 
         update();

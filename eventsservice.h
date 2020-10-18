@@ -3,8 +3,10 @@
 
 #include <map>
 #include <functional>
-
-typedef std::function<void(void*)> EventCallback;
+#include <vector>
+#include "frame.h"
+#include "image.h"
+#include "utils.h"
 
 enum EventsTypes
 {
@@ -19,6 +21,49 @@ enum EventsTypes
     None
 };
 
+struct EventParams
+{
+    virtual ~EventParams() = default;
+};
+
+struct CreateAnimationPressedParams : public EventParams
+{
+    std::vector<Frame*> Frames;
+};
+
+struct SpriteSheetLoadedParams : public EventParams
+{
+    const Image* SpriteSheetImage;
+    std::vector<Frame*> Frames;
+};
+
+struct StartBgColorPickParams : public EventParams {};
+
+struct EndBgColorPickParams : public EventParams
+{
+    GraphicsUtils::PixelColor Color;
+};
+
+struct RedrawImageParams : public EventParams {};
+
+struct SelectedFrameOnImageParams : public EventParams
+{
+    int FrameIndex;
+    bool IsCtrlPressed;
+};
+
+struct SelectedFrameInListParams : public EventParams
+{
+    int FrameIndex;
+};
+
+struct IsolateSelectedFrameParams : public EventParams
+{
+    bool Isolate;
+};
+
+typedef std::function<void(EventParams&)> EventCallback;
+
 class EventsService
 {
 public:
@@ -30,7 +75,7 @@ public:
 
     int Subscribe(EventsTypes type, EventCallback callback);
     void UnSubscribe(EventsTypes type, int id);
-    void Publish(EventsTypes type, void* data = nullptr);
+    void Publish(EventsTypes type, EventParams& data);
 
 private:
     EventsService();

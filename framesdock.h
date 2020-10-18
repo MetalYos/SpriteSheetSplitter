@@ -33,8 +33,8 @@ private slots:
 
 // Event Handlers
 private:
-    void OnSpriteSheetLoaded(void* data);
-    void OnSelectedFrameOnImage(void* data);
+    void OnSpriteSheetLoaded(EventParams& data);
+    void OnSelectedFrameOnImage(EventParams& data);
     void OnToleranceValueChanged(int i);
 
 private:

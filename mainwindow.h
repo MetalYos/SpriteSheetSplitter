@@ -6,6 +6,7 @@
 #include <QAction>
 #include "frameswindow.h"
 #include "animationwindow.h"
+#include "eventsservice.h"
 
 // Forward Declerations
 class BackgroundColorListWidget;
@@ -30,7 +31,7 @@ private:
     void CreateCentralWidget();
 
     // Event handlers
-    void OnCreateAnimationPressed(void* data);
+    void OnCreateAnimationPressed(EventParams& data);
 
 private slots:
     void OnSelectFramesView();

@@ -7,9 +7,10 @@
 #include <QImage>
 #include <QListWidget>
 #include <QScrollArea>
+#include <QLabel>
+#include "eventsservice.h"
 #include "animationswindowviewmodel.h"
 #include "image.h"
-#include <QLabel>
 
 class AnimationWindow : public QMainWindow
 {
@@ -28,8 +29,8 @@ private:
     bool LoadImage(const Image* image, Frame* frame);
 
     // Event Handles
-    void OnSpriteSheetLoaded(void* data);
-    void OnCreateAnimationPressed(void* data);
+    void OnSpriteSheetLoaded(EventParams& data);
+    void OnCreateAnimationPressed(EventParams& data);
 
 private slots:
     void OnGoToStartPressed();

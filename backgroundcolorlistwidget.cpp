@@ -29,17 +29,14 @@ void BackgroundColorListWidget::InitGui()
     setLayout(_mainLayout);
 }
 
-void BackgroundColorListWidget::OnEndBgColorPick(void* data)
+void BackgroundColorListWidget::OnEndBgColorPick(EventParams& data)
 {
-    if (data == nullptr)
-        return;
-
-    GraphicsUtils::PixelColor* bgColor = static_cast<GraphicsUtils::PixelColor*>(data);
+    EndBgColorPickParams& endBgColorParams = dynamic_cast<EndBgColorPickParams&>(data);
     std::stringstream ss;
-    ss << "background-color: rgba(" << (int)bgColor->R << "," <<
-          (int)bgColor->G << "," <<
-          (int)bgColor->B << "," <<
-          (int)bgColor->A << ");";
+    ss << "background-color: rgba(" << (int)endBgColorParams.Color.R << "," <<
+          (int)endBgColorParams.Color.G << "," <<
+          (int)endBgColorParams.Color.B << "," <<
+          (int)endBgColorParams.Color.A << ");";
     _rows[_pressedOnRowIndex].ColorButton->setStyleSheet(ss.str().c_str());
 
     viewModel.SetFrameDetectionParameters(GetBgColors());
@@ -109,7 +106,8 @@ void BackgroundColorListWidget::OnRemoveBgColorClicked()
 
 void BackgroundColorListWidget::OnSelectBgColorClicked()
 {
-    EventsService::Instance().Publish(EventsTypes::StartBgColorPick, nullptr);
+    StartBgColorPickParams params;
+    EventsService::Instance().Publish(EventsTypes::StartBgColorPick, params);
 
     QPushButton* button = qobject_cast<QPushButton*>(sender());
     if (button != nullptr)

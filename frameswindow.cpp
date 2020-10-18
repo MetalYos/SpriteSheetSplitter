@@ -115,13 +115,14 @@ void FramesWindow::CreateCentralWidget()
     setCentralWidget(centralWidget);
 }
 
-void FramesWindow::OnSelectedFrameInList(void* data)
+void FramesWindow::OnSelectedFrameInList(EventParams& data)
 {
-    if (data == nullptr)
+    SelectedFrameInListParams& params = dynamic_cast<SelectedFrameInListParams&>(data);
+
+    if (params.FrameIndex < 0)
         return;
 
-    int* index = static_cast<int*>(data);
-    Frame* frame = viewModel.GetFrame(*index);
+    Frame* frame = viewModel.GetFrame(params.FrameIndex);
     if (frame == nullptr)
         return;
 
@@ -171,7 +172,10 @@ void FramesWindow::OnOpenSpriteSheet()
     {
         spriteSheetLabel->LoadImage(viewModel.GetImage());
         viewModel.ClearFrames();
-        EventsService::Instance().Publish(EventsTypes::SpriteSheetLoaded, nullptr);
+
+        SpriteSheetLoadedParams params;
+        params.SpriteSheetImage = viewModel.GetImage();
+        EventsService::Instance().Publish(EventsTypes::SpriteSheetLoaded, params);
 
         // Enable create animation action
         createAnimAction->setDisabled(false);
@@ -195,10 +199,11 @@ void FramesWindow::OnImportMetaData()
     {
         spriteSheetLabel->LoadImage(viewModel.GetImage());
         viewModel.SetFrames(results.second);
-        std::pair<const Image*, std::vector<Frame*>> output;
-        output.first = viewModel.GetImage();
-        output.second = results.second;
-        EventsService::Instance().Publish(EventsTypes::SpriteSheetLoaded, &output);
+
+        SpriteSheetLoadedParams params;
+        params.SpriteSheetImage = viewModel.GetImage();
+        params.Frames = results.second;
+        EventsService::Instance().Publish(EventsTypes::SpriteSheetLoaded, params);
 
         // Enable create animation action
         createAnimAction->setDisabled(false);
@@ -231,12 +236,16 @@ void FramesWindow::OnExportMetaData()
 
 void FramesWindow::OnIsolateFrameToggled(bool checked)
 {
-    EventsService::Instance().Publish(EventsTypes::IsolateSelectedFrame, &checked);
+    IsolateSelectedFrameParams params;
+    params.Isolate = checked;
+    EventsService::Instance().Publish(EventsTypes::IsolateSelectedFrame, params);
 }
 
 void FramesWindow::OnCreateNewAnimation()
 {
     auto frames = viewModel.GetSelectedFrames();
 
-    EventsService::Instance().Publish(EventsTypes::CreateAnimationPressed, &frames);
+    CreateAnimationPressedParams params;
+    params.Frames = frames;
+    EventsService::Instance().Publish(EventsTypes::CreateAnimationPressed, params);
 }

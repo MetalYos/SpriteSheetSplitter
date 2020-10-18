@@ -24,7 +24,7 @@ void EventsService::UnSubscribe(EventsTypes type, int id)
     _callbacks[(int)type].erase(id);
 }
 
-void EventsService::Publish(EventsTypes type, void* data)
+void EventsService::Publish(EventsTypes type, EventParams& data)
 {
     if (type == EventsTypes::None)
         return;

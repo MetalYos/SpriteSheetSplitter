@@ -4,7 +4,6 @@
 #include <QStackedWidget>
 #include <QPushButton>
 #include "settings.h"
-#include "eventsservice.h"
 
 #include <sstream>
 #include <iostream>
@@ -85,7 +84,7 @@ void MainWindow::CreateCentralWidget()
     setCentralWidget(mainWidget);
 }
 
-void MainWindow::OnCreateAnimationPressed(void* data)
+void MainWindow::OnCreateAnimationPressed(EventParams& data)
 {
     mainWidget->setCurrentIndex(1);
 }

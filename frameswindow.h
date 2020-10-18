@@ -14,6 +14,7 @@
 #include "frameswindowviewmodel.h"
 #include "frame.h"
 #include "imagelabel.h"
+#include "eventsservice.h"
 
 // Forward Declerations
 class BackgroundColorListWidget;
@@ -33,7 +34,7 @@ private:
     void CreateCentralWidget();
 
     // Events Service Handles
-    void OnSelectedFrameInList(void* data);
+    void OnSelectedFrameInList(EventParams& data);
 
 private slots:
     void OnOpenSpriteSheet();

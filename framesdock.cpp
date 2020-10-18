@@ -179,10 +179,15 @@ void FramesDock::OnFrameSelectionChanged()
     {
         int frameIndex = framesList->row(selectedFrame);
         selectedIndices.push_back(frameIndex);
-        EventsService::Instance().Publish(EventsTypes::SelectedFrameInList, &frameIndex);
+
+        SelectedFrameInListParams params;
+        params.FrameIndex = frameIndex;
+        EventsService::Instance().Publish(EventsTypes::SelectedFrameInList, params);
     }
     viewModel.SetSelectedFrames(selectedIndices);
-    EventsService::Instance().Publish(EventsTypes::RedrawImage);
+
+    RedrawImageParams params;
+    EventsService::Instance().Publish(EventsTypes::RedrawImage, params);
 }
 
 void FramesDock::OnAddFrameButtonClicked()
@@ -229,7 +234,8 @@ void FramesDock::OnClearFramesButtonClicked()
     // Clear frames list
     viewModel.ClearFrames();
 
-    EventsService::Instance().Publish(EventsTypes::RedrawImage);
+    RedrawImageParams params;
+    EventsService::Instance().Publish(EventsTypes::RedrawImage, params);
 }
 
 void FramesDock::OnUseAdaptiveStepCheckboxStateChanged(int state)
@@ -241,10 +247,11 @@ void FramesDock::OnUseAdaptiveStepCheckboxStateChanged(int state)
 
 // TODO: move relevant parts to MainWindowViewModel
 void FramesDock::OnCalculateFrameButtonClicked()
-{
-
+{    
     viewModel.DetectSelectedFrames();
-    EventsService::Instance().Publish(EventsTypes::RedrawImage);
+
+    RedrawImageParams params;
+    EventsService::Instance().Publish(EventsTypes::RedrawImage, params);
 }
 
 void FramesDock::OnCalculateAllFramesButtonClicked()
@@ -254,37 +261,40 @@ void FramesDock::OnCalculateAllFramesButtonClicked()
         AddFrameToList(i + 1);
 }
 
-void FramesDock::OnSpriteSheetLoaded(void* data)
+void FramesDock::OnSpriteSheetLoaded(EventParams& data)
 {
+    SpriteSheetLoadedParams& params = dynamic_cast<SpriteSheetLoadedParams&>(data);
+
     // Clear frames List widget
     framesList->clear();
 
     // Load frames into list if available
-    if (data != nullptr)
+    if (params.Frames.size() > 0)
     {
-        auto input = static_cast<std::pair<const Image*, std::vector<Frame*>>*>(data);
-        for (size_t i = 0; i < input->second.size(); i++)
+        for (size_t i = 0; i < params.Frames.size(); i++)
             AddFrameToList(i + 1);
     }
 
     // Enable dock
     setDisabled(false);
 
-    EventsService::Instance().Publish(EventsTypes::RedrawImage);
+    RedrawImageParams outParams;
+    EventsService::Instance().Publish(EventsTypes::RedrawImage, outParams);
 }
 
-void FramesDock::OnSelectedFrameOnImage(void* data)
+void FramesDock::OnSelectedFrameOnImage(EventParams& data)
 {
-    if (data == nullptr)
+    SelectedFrameOnImageParams& params = dynamic_cast<SelectedFrameOnImageParams&>(data);
+
+    if (params.FrameIndex < 0)
     {
         framesList->clearSelection();
     }
     else
     {
-        std::pair<int, bool>* index = static_cast<std::pair<int, bool>*>(data);
-        if (index->second)
+        if (!params.IsCtrlPressed)
             framesList->clearSelection();
-        SelectFrame(index->first);
+        SelectFrame(params.FrameIndex);
     }
 }
 

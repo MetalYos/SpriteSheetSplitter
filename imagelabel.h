@@ -10,6 +10,7 @@
 #include <QCursor>
 #include "frameswindowviewmodel.h"
 #include "image.h"
+#include "eventsservice.h"
 
 class ImageLabel : public QLabel
 {
@@ -22,9 +23,9 @@ public:
 
 private:
     // Event Handlers
-    void OnStartBgColorPick(void* data);
-    void OnRedrawImage(void* data);
-    void OnIsolateSelectedFrame(void* data);
+    void OnStartBgColorPick(EventParams& data);
+    void OnRedrawImage(EventParams& data);
+    void OnIsolateSelectedFrame(EventParams& data);
 
     QSize sizeHint() const override;
     void mousePressEvent(QMouseEvent* event) override;

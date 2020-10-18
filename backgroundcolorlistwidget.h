@@ -8,6 +8,7 @@
 #include <vector>
 #include "frameswindowviewmodel.h"
 #include "utils.h"
+#include "eventsservice.h"
 
 class BackgroundColorListWidget : public QWidget
 {
@@ -23,7 +24,7 @@ private:
     int AddColorItemRow();
     void RemoveColorItem(int index);
 
-    void OnEndBgColorPick(void* data);
+    void OnEndBgColorPick(EventParams& data);
 
 private slots:
     void OnAddBgColorClicked();

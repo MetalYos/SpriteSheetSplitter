@@ -180,24 +180,21 @@ void AnimationWindow::OnPlayPausePressed()
     }
 }
 
-void AnimationWindow::OnSpriteSheetLoaded(void* data)
+void AnimationWindow::OnSpriteSheetLoaded(EventParams& data)
 {
-    if (data == nullptr)
+    SpriteSheetLoadedParams& params = dynamic_cast<SpriteSheetLoadedParams&>(data);
+    if (params.SpriteSheetImage == nullptr)
         return;
-    auto input = static_cast<std::pair<const Image*, std::vector<Frame*>>*>(data);
-    image = input->first;
+
+    image = params.SpriteSheetImage;
 }
 
-void AnimationWindow::OnCreateAnimationPressed(void* data)
+void AnimationWindow::OnCreateAnimationPressed(EventParams& data)
 {
-    if (data == nullptr)
-        return;
-
-    std::vector<Frame*>* frames = static_cast<std::vector<Frame*>*>(data);
-    Animation* anim = new Animation(*frames);
-
+    CreateAnimationPressedParams& params = dynamic_cast<CreateAnimationPressedParams&>(data);
+    Animation* anim = new Animation(params.Frames);
     viewModel.AddAnimation(anim);
 
-    if (frames->size() > 0)
-        LoadImage(image, (*frames)[0]);
+    if (params.Frames.size() > 0)
+        LoadImage(image, (params.Frames)[0]);
 }
