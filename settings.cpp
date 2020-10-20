@@ -101,6 +101,7 @@ bool Settings::SaveSettings()
     {
         outFile << "\t\t{" << std::endl;
         outFile << "\t\t\t\"Name\": \"" << setting.first.FieldName << "\"," << std::endl;
+        outFile << "\t\t\t\"Category: \"" << setting.first.Category << "\"," << std::endl;
         outFile << "\t\t\t\"Type\": \"" << setting.first.Type << "\"," << std::endl;
         if (StringUtils::ToLower(setting.first.Type) == "bool")
         {

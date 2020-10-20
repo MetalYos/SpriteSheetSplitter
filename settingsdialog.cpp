@@ -87,6 +87,15 @@ void SettingsDialog::CreateAnimsSettingsTab()
 
 void SettingsDialog::OnOkButtonPressed()
 {
+    // Gather and save data
+    Settings::Set(Settings::Fields::FRAME_INIT_WIDTH, frameInitHeight->value());
+    Settings::Set(Settings::Fields::FRAME_INIT_HEIGHT, frameInitWidth->value());
+    Settings::Set(Settings::Fields::FRAME_TOLERANCE_INIT, frameTolerance->value());
+    Settings::Set(Settings::Fields::FRAME_COLOR_TOLERANCE, frameColorTolerance->value());
+    Settings::Set(Settings::Fields::ANIMATION_FPS, animationFps->value());
+
+    Settings::SaveSettings();
+
     close();
 }
 
