@@ -8,6 +8,13 @@
 class Settings
 {
 public:
+    enum FieldCategories
+    {
+        FRAME_DETECTION,
+        ANIMATION,
+        NONE_CATEGORY
+    };
+
     enum Fields
     {
         FRAME_INIT_WIDTH,
@@ -20,7 +27,7 @@ public:
         FRAME_DETECTION_ALGO_STEP,
         FRAME_DETECTION_ALGO_USE_ADAPTIVE_STEP,
         ANIMATION_FPS,
-        NONE
+        NONE_FIELD
     };
 
     enum MouseButtons
@@ -35,6 +42,7 @@ private:
     {
         std::string FieldName;
         Fields Field;
+        FieldCategories Category;
         std::string Type;
 
         bool operator==(const FieldKey& f) const
@@ -72,11 +80,13 @@ public:
 
 private:
     static Fields StringToField(const std::string& fieldName);
+    static FieldCategories StringToCategory(const std::string& category);
     static FieldValue GetValueFromString(const FieldKey& key, std::string value);
     static FieldValue& GetFieldValue(Fields field);
 
 private:
     static std::map<std::string, Fields> fieldNamesMap;
+    static std::map<std::string, FieldCategories> categoryNamesMap;
 
     static const char* settingsFile;
     static std::unordered_map<FieldKey, FieldValue, FieldKeyHash> settings;

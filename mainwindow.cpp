@@ -4,6 +4,7 @@
 #include <QStackedWidget>
 #include <QPushButton>
 #include "settings.h"
+#include "settingsdialog.h"
 
 #include <sstream>
 #include <iostream>
@@ -41,6 +42,10 @@ void MainWindow::CreateMenu()
 
 void MainWindow::CreateFileMenu()
 {
+    QAction* settingsAction = new QAction("&Settings", this);
+    settingsAction->setStatusTip(tr("Open Settings window"));
+    connect(settingsAction, &QAction::triggered, this, &MainWindow::OnSettingsTriggered);
+
     QAction* quitAction = new QAction("&Quit", this);
     quitAction->setStatusTip(tr("Quit the application"));
     quitAction->setShortcuts(QKeySequence::Quit);
@@ -48,6 +53,7 @@ void MainWindow::CreateFileMenu()
 
     QMenu* fileMenu;
     fileMenu = menuBar()->addMenu("&File");
+    fileMenu->addAction(settingsAction);
     fileMenu->addAction(quitAction);
 }
 
@@ -97,4 +103,13 @@ void MainWindow::OnSelectFramesView()
 void MainWindow::OnSelectAnimsView()
 {
     mainWidget->setCurrentIndex(1);
+}
+
+void MainWindow::OnSettingsTriggered()
+{
+    SettingsDialog* dlg = new SettingsDialog(this);
+
+    dlg->show();
+    dlg->raise();
+    dlg->activateWindow();
 }

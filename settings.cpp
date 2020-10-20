@@ -17,6 +17,11 @@ std::map<std::string, Settings::Fields> Settings::fieldNamesMap = {
     { "FRAME_DETECTION_ALGO_USE_ADAPTIVE_STEP", Settings::Fields::FRAME_DETECTION_ALGO_USE_ADAPTIVE_STEP },
     { "ANIMATION_FPS", Settings::Fields::ANIMATION_FPS }
 };
+std::map<std::string, Settings::FieldCategories> Settings::categoryNamesMap = {
+    { "FRAME_DETECTION", Settings::FieldCategories::FRAME_DETECTION },
+    { "ANIMATION", Settings::FieldCategories::ANIMATION }
+};
+
 std::unordered_map<Settings::FieldKey, Settings::FieldValue, Settings::FieldKeyHash> Settings::settings;
 
 bool Settings::LoadSettings()
@@ -45,14 +50,16 @@ bool Settings::LoadSettings()
         getline(inFile, line);
         std::string name = JsonHelper::GetStringValue(line);
         getline(inFile, line);
+        std::string category = JsonHelper::GetStringValue(line);
+        getline(inFile, line);
         std::string type = JsonHelper::GetStringValue(line);
         getline(inFile, line);
         std::string value = JsonHelper::GetStringValue(line);
         // Close curly braces
         getline(inFile, line);
 
-        FieldKey key { name, StringToField(name), type };
-        if (key.Field != Fields::NONE)
+        FieldKey key { name, StringToField(name), StringToCategory(category), type };
+        if (key.Field != Fields::NONE_FIELD)
         {
             FieldValue fValue;
             if (StringUtils::ToLower(key.Type) == "int")
@@ -166,7 +173,19 @@ Settings::Fields Settings::StringToField(const std::string& fieldName)
     }
     catch (...)
     {
-        return Settings::Fields::NONE;
+        return Settings::Fields::NONE_FIELD;
+    }
+}
+
+Settings::FieldCategories Settings::StringToCategory(const std::string& category)
+{
+    try
+    {
+        return categoryNamesMap.at(category);
+    }
+    catch (...)
+    {
+        return Settings::FieldCategories::NONE_CATEGORY;
     }
 }
 
@@ -180,7 +199,7 @@ Settings::FieldValue& Settings::GetFieldValue(Fields field)
 
 void Settings::Set(Fields field, int value)
 {
-    if (field == Fields::NONE)
+    if (field == Fields::NONE_FIELD)
         return;
 
     GetFieldValue(field).Int = value;
@@ -188,7 +207,7 @@ void Settings::Set(Fields field, int value)
 
 void Settings::Set(Fields field, const std::string& value)
 {
-    if (field == Fields::NONE)
+    if (field == Fields::NONE_FIELD)
         return;
 
     GetFieldValue(field).Str = value;
@@ -196,7 +215,7 @@ void Settings::Set(Fields field, const std::string& value)
 
 void Settings::Set(Fields field, bool value)
 {
-    if (field == Fields::NONE)
+    if (field == Fields::NONE_FIELD)
         return;
 
     GetFieldValue(field).Bool = value;

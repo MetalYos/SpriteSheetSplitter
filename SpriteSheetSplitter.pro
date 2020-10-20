@@ -26,6 +26,7 @@ SOURCES += \
     mainwindow.cpp \
     qtutils.cpp \
     settings.cpp \
+    settingsdialog.cpp \
     utils.cpp
 
 HEADERS += \
@@ -45,6 +46,7 @@ HEADERS += \
     mainwindow.h \
     qtutils.h \
     settings.h \
+    settingsdialog.h \
     stb_image.h \
     utils.h
 

@@ -36,6 +36,7 @@ private:
 private slots:
     void OnSelectFramesView();
     void OnSelectAnimsView();
+    void OnSettingsTriggered();
 
 private:
     Ui::MainWindow *ui;

@@ -3,11 +3,10 @@ TODO:
 - Add animation support (add, remove, play).
 - Check why cursor is not changed correctly.
 - Change it so pressing on the arrow keys on the spritesheet will go up/down/left/right in the frames (OPTIONAL).
-- Add Settings window.
 - Add a Background matrix and at the start of the Calculate All Frames algorithm mark all of the pixels
 that are backgound (have a direct route to one of the image edges).
-- Add Frame editing section in the frames doxk (option to change top, left, width, height and origin).
-- Add an Add Animation button (from selected frames) - adds the frames to a new animation and changes to Animation view.
+- Add Frame editing section in the frames dock (option to change top, left, width, height and origin).
+- Find a way to make the settings window more dynamic.
 
 DONE:
 - Add Calculate All algorithm.
@@ -20,3 +19,5 @@ DONE:
 - Add option to Isolate frame (in order to move/edit).
 - Check why Tolerance is not working.
 - Add option to select multiple frames using the ctrl button.
+- Add an Add Animation button (from selected frames) - adds the frames to a new animation and changes to Animation view.
+- Add Settings window.
