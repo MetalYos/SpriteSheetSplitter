@@ -27,6 +27,7 @@ SOURCES += \
     qtutils.cpp \
     settings.cpp \
     settingsdialog.cpp \
+    timelinewidget.cpp \
     utils.cpp
 
 HEADERS += \
@@ -48,6 +49,7 @@ HEADERS += \
     settings.h \
     settingsdialog.h \
     stb_image.h \
+    timelinewidget.h \
     utils.h
 
 FORMS += \

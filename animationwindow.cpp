@@ -11,6 +11,7 @@
 #include <sstream>
 #include "eventsservice.h"
 #include "settings.h"
+#include "timelinewidget.h"
 
 AnimationWindow::AnimationWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -62,17 +63,25 @@ void AnimationWindow::CreateTimelineDock()
 {
     QDockWidget* timelineDock = new QDockWidget(tr("Timeline"), this);
     timelineDock->setAllowedAreas(Qt::BottomDockWidgetArea | Qt::TopDockWidgetArea);
-    timelineDock->setMaximumHeight(100);
+    timelineDock->setMaximumHeight(200);
     timelineDock->setMinimumHeight(70);
 
-    CreatePlayControlsWidget(timelineDock);
+    QVBoxLayout* mainLayout = new QVBoxLayout();
+    QWidget* dockWidget = new QWidget(timelineDock);
+    dockWidget->setLayout(mainLayout);
 
+    mainLayout->addWidget(CreatePlayControlsWidget(dockWidget));
+
+    TimelineWidget* timeline = new TimelineWidget(dockWidget);
+    mainLayout->addWidget(timeline);
+
+    timelineDock->setWidget(dockWidget);
     addDockWidget(Qt::BottomDockWidgetArea, timelineDock);
 }
 
-void AnimationWindow::CreatePlayControlsWidget(QDockWidget* timelineDock)
+QWidget* AnimationWindow::CreatePlayControlsWidget(QWidget* dockWidget)
 {
-    QWidget* playControlsWidget = new QWidget(this);
+    QWidget* playControlsWidget = new QWidget(dockWidget);
 
     QHBoxLayout* layout = new QHBoxLayout();
     layout->setSizeConstraint(QLayout::SetMaximumSize);
@@ -105,7 +114,7 @@ void AnimationWindow::CreatePlayControlsWidget(QDockWidget* timelineDock)
     layout->addWidget(goToEndButton);
 
     playControlsWidget->setLayout(layout);
-    timelineDock->setWidget(playControlsWidget);
+    return playControlsWidget;
 }
 
 void AnimationWindow::CreateCentralWidget()
@@ -133,6 +142,9 @@ void AnimationWindow::CreateCentralWidget()
 
 bool AnimationWindow::SetFrameImage()
 {
+    if (viewModel.GetSelectedAnimation() == nullptr)
+        return false;
+
     auto frame = viewModel.GetSelectedAnimation()->GetCurrentFrame();
     auto image = viewModel.GetImage();
 
@@ -205,6 +217,9 @@ void AnimationWindow::OnNextFramePressed()
 
 void AnimationWindow::OnPlayPausePressed()
 {
+    if (viewModel.GetSelectedAnimation() == nullptr)
+        return;
+
     if (viewModel.GetAnimationState() == Animation::AnimationStates::PAUSED ||
             viewModel.GetAnimationState() == Animation::AnimationStates::STOPPED)
     {

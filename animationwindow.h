@@ -24,7 +24,7 @@ private:
 
     void CreateAnimationsDock();
     void CreateTimelineDock();
-    void CreatePlayControlsWidget(QDockWidget* timelineDock);
+    QWidget* CreatePlayControlsWidget(QWidget* dockWidget);
     void CreateCentralWidget();
 
     bool SetFrameImage();

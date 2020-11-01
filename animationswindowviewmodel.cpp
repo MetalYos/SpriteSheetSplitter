@@ -78,6 +78,9 @@ void AnimationsWindowViewModel::SelectAnimation(int index)
 
 Animation* AnimationsWindowViewModel::GetSelectedAnimation()
 {
+    if (selectedAnimIndex < 0)
+        return nullptr;
+
     return GetAnimation(selectedAnimIndex);
 }
 
@@ -138,22 +141,38 @@ Animation::AnimationStates AnimationsWindowViewModel::GetAnimationState() const
 
 void AnimationsWindowViewModel::GoToStart()
 {
-    GetSelectedAnimation()->GoToStart();
+    auto anim = GetSelectedAnimation();
+    if (anim == nullptr)
+        return;
+
+    anim->GoToStart();
 }
 
 void AnimationsWindowViewModel::GoToEnd()
 {
-    GetSelectedAnimation()->GoToEnd();
+    auto anim = GetSelectedAnimation();
+    if (anim == nullptr)
+        return;
+
+    anim->GoToEnd();
 }
 
 void AnimationsWindowViewModel::GoToPreviousFrame()
 {
-    GetSelectedAnimation()->GoToPreviousFrame();
+    auto anim = GetSelectedAnimation();
+    if (anim == nullptr)
+        return;
+
+    anim->GoToPreviousFrame();
 }
 
 void AnimationsWindowViewModel::GoToNextFrame()
 {
-    GetSelectedAnimation()->GoToNextFrame();
+    auto anim = GetSelectedAnimation();
+    if (anim == nullptr)
+        return;
+
+    anim->GoToNextFrame();
 }
 
 void AnimationsWindowViewModel::Update()
