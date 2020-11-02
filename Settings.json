@@ -1,65 +1,95 @@
 {
-	"NumSettings": 10,
+	"NumSettings": 15,
 	"Settings": [
 		{
 			"Name": "FRAME_INIT_WIDTH",
-                        "Category": "FRAME_DETECTION",
+            "Category": "FRAME_DETECTION",
 			"Type": "int",
 			"Value": "100"
 		},
 		{
 			"Name": "FRAME_INIT_HEIGHT",
-                        "Category": "FRAME_DETECTION",
+            "Category": "FRAME_DETECTION",
 			"Type": "int",
 			"Value": "100"
 		},
 		{
 			"Name": "FRAME_TOLERANCE_MIN",
-                        "Category": "FRAME_DETECTION",
+            "Category": "FRAME_DETECTION",
 			"Type": "int",
 			"Value": "0"
 		},
 		{
 			"Name": "FRAME_TOLERANCE_MAX",
-                        "Category": "FRAME_DETECTION",
+            "Category": "FRAME_DETECTION",
 			"Type": "int",
 			"Value": "50"
 		},
 		{
 			"Name": "FRAME_TOLERANCE_INIT",
-                        "Category": "FRAME_DETECTION",
+            "Category": "FRAME_DETECTION",
 			"Type": "int",
 			"Value": "1"
 		},
 		{
 			"Name": "FRAME_COLOR_TOLERANCE",
-                        "Category": "FRAME_DETECTION",
+            "Category": "FRAME_DETECTION",
 			"Type": "int",
 			"Value": "3"
 		},
 		{
 			"Name": "COLOR_PICKER_CURSOR_PATH",
-                        "Category": "FRAME_DETECTION",
+            "Category": "FRAME_DETECTION",
 			"Type": "string",
 			"Value": "color_picker_cursor.png"
 		},
 		{
 			"Name": "FRAME_DETECTION_ALGO_STEP",
-                        "Category": "FRAME_DETECTION",
+            "Category": "FRAME_DETECTION",
 			"Type": "int",
 			"Value": "30"
 		},
 		{
 			"Name": "FRAME_DETECTION_ALGO_USE_ADAPTIVE_STEP",
-                        "Category": "FRAME_DETECTION",
+            "Category": "FRAME_DETECTION",
 			"Type": "bool",
 			"Value": "true"
 		},
 		{
 			"Name": "ANIMATION_FPS",
-                        "Category": "ANIMATION",
+            "Category": "ANIMATION",
 			"Type": "int",
 			"Value": "60"
+		},
+		{
+			"Name": "TIMELINE_TOP_SCALE",
+			"Category": "TIMELINE",
+			"Type": "float",
+			"Value": "0.4"
+		},
+		{
+			"Name": "TIMELINE_PADDING_SCALE",
+            "Category": "TIMELINE",
+			"Type": "float",
+			"Value": "0.02"
+		},
+		{
+			"Name": "TIMELINE_TOP_BG_COLOR",
+            "Category": "TIMELINE",
+			"Type": "uchar3",
+			"Value": [43, 43, 43]
+		},
+		{
+			"Name": "TIMELINE_BOTTOM_BG_COLOR",
+            "Category": "TIMELINE",
+			"Type": "uchar3",
+			"Value": [66, 66, 66]
+		},
+		{
+			"Name": "TIMELINE_SELECTED_FRAME_COLOR",
+            "Category": "TIMELINE",
+			"Type": "uchar3",
+			"Value": [81, 123, 189]
 		}
 	]
 }

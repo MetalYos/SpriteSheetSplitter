@@ -21,4 +21,9 @@ namespace QtUtils
         pColor.A = color.alpha();
         return pColor;
     }
+
+    QColor UChar3ToQColor(unsigned char color[3])
+    {
+        return QColor(color[0], color[1], color[2]);
+    }
 }

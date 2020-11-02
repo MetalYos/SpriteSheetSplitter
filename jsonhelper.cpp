@@ -106,7 +106,7 @@ bool JsonHelper::ExportJson(const std::string& outputPath, const std::string& sS
     return true;
 }
 
-std::string JsonHelper::GetStringValue(const std::string& line)
+std::string JsonHelper::GetStringValue(const std::string& line, char startDelimeter, char endDelimeter)
 {
     int startIndex;
     for (startIndex = line.size() - 1; startIndex >= 0; startIndex--)
@@ -119,11 +119,11 @@ std::string JsonHelper::GetStringValue(const std::string& line)
     while (line[startIndex] == ' ')
         startIndex++;
 
-    if (line[startIndex] == '"')
+    if (line[startIndex] == startDelimeter)
         startIndex++;
 
     int endIndex = startIndex;
-    while (line[endIndex] != '"' && line[endIndex] != '\r' && line[endIndex] != '\n' && endIndex < (int)line.size())
+    while (line[endIndex] != endDelimeter && line[endIndex] != '\r' && line[endIndex] != '\n' && endIndex < (int)line.size())
         endIndex++;
 
     return line.substr(startIndex, endIndex - startIndex);
@@ -147,4 +147,48 @@ bool JsonHelper::GetBoolValue(const std::string& line)
 {
     std::string value = GetStringValue(line);
     return (value == "true" || value == "True");
+}
+
+float JsonHelper::GetFloatValue(const std::string &line)
+{
+    std::string value = GetStringValue(line);
+    try
+    {
+        return std::stof(value);
+    }
+    catch (...)
+    {
+        return 0;
+    }
+}
+
+void JsonHelper::GetUChar3(const std::string& line, unsigned char* output)
+{
+    if (output == nullptr)
+        return;
+    std::string value = GetStringValue(line);
+    int counter = 0;
+    int startIndex = 0;
+    int endIndex = 0;
+
+    while (counter < 3 && startIndex < (int)value.size())
+    {
+        while (value[startIndex] == ' ' || value[startIndex] == '[')
+            startIndex++;
+
+        endIndex = startIndex;
+        while (value[endIndex] != ',' && value[endIndex] != ']' &&
+               value[endIndex] != '\r' && value[endIndex] != '\n' && endIndex < (int)value.size())
+            endIndex++;
+
+        try
+        {
+            output[counter++] = (unsigned char)std::stoi(value.substr(startIndex, endIndex - startIndex));
+            startIndex = endIndex + 1;
+        }
+        catch(...)
+        {
+            return;
+        }
+    }
 }

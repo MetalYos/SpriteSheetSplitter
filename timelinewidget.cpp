@@ -1,12 +1,16 @@
 #include "timelinewidget.h"
-#include <QPainter>
 #include <QLabel>
 #include <QVBoxLayout>
 #include <sstream>
+#include "settings.h"
+#include "qtutils.h"
 
 TimelineWidget::TimelineWidget(QWidget *parent) : QWidget(parent),
-    _numFrames(60), _currentFrame(1), _frameSpacing(5), _frameToFrameSpacing(0)
+    _numFrames(60), _firstFrame(1), _currentFrame(1), _frameSpacing(5), _frameToFrameSpacing(0),
+    _frameRectWidth(20)
 {
+    _lastFrame = _firstFrame + (_numFrames - 1);
+
     InitGui();
 }
 
@@ -33,48 +37,62 @@ void TimelineWidget::paintEvent(QPaintEvent* event)
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
-    QRect topRect(0, 0, width(), height() * 0.4);
+    DrawBackgrounds(painter);
+    DrawFrameNumbers(painter);
+    DrawCurrentFrame(painter);
+}
+
+void TimelineWidget::DrawBackgrounds(QPainter& painter)
+{
+    QRect topRect(0, 0, width(), height() * Settings::GetFloat(Settings::Fields::TIMELINE_TOP_SCALE));
     QRect bottomRect(0, topRect.bottom(), width(), height() - topRect.height());
-    QRect textRect;
 
     // Draw rectangles
     painter.setPen(Qt::NoPen);
-    painter.fillRect(topRect, QColor(43, 43, 43));
-    painter.fillRect(bottomRect, QColor(66, 66, 66));
+    painter.fillRect(topRect, QtUtils::UChar3ToQColor(Settings::GetUChar3(Settings::Fields::TIMELINE_TOP_BG_COLOR)));
+    painter.fillRect(bottomRect, QtUtils::UChar3ToQColor(Settings::GetUChar3(Settings::Fields::TIMELINE_BOTTOM_BG_COLOR)));
+}
 
-    // Draw frame numbers
-    int padding = (int)(width() * 0.02f);
-    topRect.setLeft(topRect.left() + padding);
-    bottomRect.setLeft(bottomRect.left() + padding);
-    int actualWidth = width() - 2 * padding;
-    int numIterations = _numFrames / _frameSpacing;
-    int spacing = actualWidth / (numIterations);
+void TimelineWidget::DrawFrameNumbers(QPainter& painter)
+{
+    int padding = (int)(width() * Settings::GetFloat(Settings::TIMELINE_PADDING_SCALE));
     painter.setPen(Qt::white);
 
-    // Always draw the first frame number and line
-    textRect = QRect(topRect.left(), topRect.top(), 20, topRect.height());
-    painter.fillRect(textRect, QColor(81, 123, 189));
-    painter.drawText(textRect, Qt::AlignCenter, "1");
-    painter.drawLine(textRect.center().x(), bottomRect.top(), textRect.center().x(), bottomRect.bottom());
-    topRect.setLeft(topRect.left() + spacing);
-    bottomRect.setLeft(bottomRect.left() + spacing);
-
-    int index = 1;
-    for (int index = 1; index <= numIterations; index++)
+    int left = padding;
+    int spacing = (width() - 2 * padding) / _numFrames;
+    for (int frame = _firstFrame; frame <= _lastFrame; frame++)
     {
-        std::stringstream sstream;
-        sstream << index * _frameSpacing;
-        painter.drawText(topRect, Qt::AlignVCenter, sstream.str().c_str(), &textRect);
-        painter.drawLine(textRect.center().x(), bottomRect.top(), textRect.center().x(), bottomRect.bottom());
-        topRect.setLeft(topRect.left() + spacing);
-        bottomRect.setLeft(bottomRect.left() + spacing);
+        if ((frame == _firstFrame) || (frame == _lastFrame) || (frame % _frameSpacing == 0))
+        {
+            std::stringstream ss;
+            QRect textRect(left, 0, _frameRectWidth, height() * Settings::GetFloat(Settings::Fields::TIMELINE_TOP_SCALE));
+            ss << frame;
+            painter.drawText(textRect, Qt::AlignCenter, ss.str().c_str());
+            painter.drawLine(textRect.center().x(), textRect.height(), textRect.center().x(), height());
+        }
+        left += spacing;
     }
+}
 
-    if ((_numFrames - (_frameSpacing * index)) > 0) {
-        // Draw last frame
-        std::stringstream sstream;
-        sstream << _numFrames;
-        painter.drawText(topRect, Qt::AlignVCenter, sstream.str().c_str(), &textRect);
-        painter.drawLine(textRect.center().x(), bottomRect.top(),textRect.center().x(), bottomRect.bottom());
-    }
+void TimelineWidget::DrawCurrentFrame(QPainter& painter)
+{
+    painter.setPen(Qt::white);
+    QColor selectedColor = QtUtils::UChar3ToQColor(Settings::GetUChar3(Settings::Fields::TIMELINE_SELECTED_FRAME_COLOR));
+
+    // Find left position of frame
+    int padding = (int)(width() * Settings::GetFloat(Settings::TIMELINE_PADDING_SCALE));
+    int spacing = (width() - 2 * padding) / _numFrames;
+    int left = padding + spacing * (_currentFrame - 1);
+
+    std::stringstream ss;
+    QRect textRect(left, 0, _frameRectWidth, height() * Settings::GetFloat(Settings::Fields::TIMELINE_TOP_SCALE));
+    ss << _currentFrame;
+    painter.fillRect(textRect, selectedColor);
+    painter.drawText(textRect, Qt::AlignCenter, ss.str().c_str());
+
+    QPen pen = painter.pen();
+    pen.setColor(selectedColor);
+    pen.setWidth(2);
+    painter.setPen(pen);
+    painter.drawLine(textRect.center().x(), textRect.height(), textRect.center().x(), height());
 }

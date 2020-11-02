@@ -4,6 +4,7 @@
 #include <string>
 #include <map>
 #include <unordered_map>
+#include "utils.h"
 
 class Settings
 {
@@ -12,6 +13,7 @@ public:
     {
         FRAME_DETECTION,
         ANIMATION,
+        TIMELINE,
         NONE_CATEGORY
     };
 
@@ -27,6 +29,11 @@ public:
         FRAME_DETECTION_ALGO_STEP,
         FRAME_DETECTION_ALGO_USE_ADAPTIVE_STEP,
         ANIMATION_FPS,
+        TIMELINE_TOP_SCALE,
+        TIMELINE_PADDING_SCALE,
+        TIMELINE_TOP_BG_COLOR,
+        TIMELINE_BOTTOM_BG_COLOR,
+        TIMELINE_SELECTED_FRAME_COLOR,
         NONE_FIELD
     };
 
@@ -38,6 +45,15 @@ public:
     };
 
 private:
+    struct Types
+    {
+        static std::string Int;
+        static std::string String;
+        static std::string Bool;
+        static std::string Float;
+        static std::string UChar3;
+    };
+
     struct FieldKey
     {
         std::string FieldName;
@@ -64,6 +80,8 @@ private:
         std::string Str;
         int Int;
         bool Bool;
+        float Float;
+        unsigned char UChar3[3];
     };
 
 public:
@@ -73,15 +91,20 @@ public:
     static int GetInt(Fields field);
     static bool GetBool(Fields field);
     static std::string GetStr(Fields field);
+    static float GetFloat(Fields field);
+    static unsigned char* GetUChar3(Fields field);
 
     static void Set(Fields field, int value);
     static void Set(Fields field, const std::string& value);
     static void Set(Fields field, bool value);
+    static void Set(Fields field, float value);
+    static void Set(Fields field, unsigned char value[3]);
 
 private:
     static Fields StringToField(const std::string& fieldName);
     static FieldCategories StringToCategory(const std::string& category);
     static FieldValue GetValueFromString(const FieldKey& key, std::string value);
+    static const FieldKey& GetFieldKey(Fields field);
     static FieldValue& GetFieldValue(Fields field);
 
 private:
