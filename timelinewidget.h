@@ -21,7 +21,7 @@ private:
     int _numFrames;
     int _currentFrame;
     int _frameSpacing;
-
+    int _frameToFrameSpacing;
 };
 
 #endif // TIMELINEWIDGET_H

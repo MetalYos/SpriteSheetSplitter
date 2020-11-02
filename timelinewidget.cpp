@@ -5,7 +5,7 @@
 #include <sstream>
 
 TimelineWidget::TimelineWidget(QWidget *parent) : QWidget(parent),
-    _numFrames(60), _currentFrame(1), _frameSpacing(5)
+    _numFrames(60), _currentFrame(1), _frameSpacing(5), _frameToFrameSpacing(0)
 {
     InitGui();
 }
@@ -51,8 +51,10 @@ void TimelineWidget::paintEvent(QPaintEvent* event)
     int spacing = actualWidth / (numIterations);
     painter.setPen(Qt::white);
 
-    // Draw first frame number
-    painter.drawText(topRect, Qt::AlignVCenter, "1", &textRect);
+    // Always draw the first frame number and line
+    textRect = QRect(topRect.left(), topRect.top(), 20, topRect.height());
+    painter.fillRect(textRect, QColor(81, 123, 189));
+    painter.drawText(textRect, Qt::AlignCenter, "1");
     painter.drawLine(textRect.center().x(), bottomRect.top(), textRect.center().x(), bottomRect.bottom());
     topRect.setLeft(topRect.left() + spacing);
     bottomRect.setLeft(bottomRect.left() + spacing);
